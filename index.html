@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ultimate Quest: Think Create Pitch</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="access-gate">
+        <div class="gate-box">
+            <h2>UNAUTHORIZED ACCESS</h2>
+            <p>IDENTIFY TO PROCEED</p>
+            
+            <select id="triad-select">
+                <option value="" disabled selected>Select Triad Unit</option>
+                <option value="T1">Unit 01</option>
+                <option value="T2">Unit 02</option>
+                <option value="T3">Unit 03</option>
+                <option value="T4">Unit 04</option>
+                <option value="T5">Unit 05</option>
+                <option value="T6">Unit 06</option>
+                <option value="T7">Unit 07</option>
+                <option value="T8">Unit 08</option>
+                <option value="T9">Unit 09</option>
+                <option value="T10">Unit 10</option>
+                <option value="T11">Unit 11</option>
+                <option value="T12">Unit 12</option>
+                <option value="T13">Unit 13</option>
+                <option value="T14">Unit 14</option>
+                <option value="T15">Unit 15</option>
+                <option value="T16">Unit 16</option>
+                <option value="T17">Unit 17</option>
+            </select>
+
+            <input type="text" id="player-alias" placeholder="ENTER ALIAS" autocomplete="off">
+            <button id="btn-login">INITIATE SEQUENCE</button>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <header>
+            <h1>THE ULTIMATE QUEST: THINK CREATE PITCH</h1>
+            <div id="team-info"></div>
+        </header>
+
+        <main>
+            <aside id="leaderboard-panel">
+                <h2>Live Standings</h2>
+                <ul id="leaderboard-list"></ul>
+            </aside>
+
+            <section id="game-stage">
+                <nav id="round-selector"></nav>
+                <div id="game-launcher"></div>
+                <iframe id="game-frame" src="" frameborder="0"></iframe>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/config.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

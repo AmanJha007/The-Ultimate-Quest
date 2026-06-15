@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #050505;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            border: 1px solid #008f11;
+            padding: 30px;
+            background: #0a0a0a;
+            text-align: center;
+        }
+        h2 { color: #14B8A6; text-transform: uppercase; margin-top: 0; }
+        
+        /* Instruction Screen */
+        #instruction-screen { display: block; }
+        .rules { text-align: left; line-height: 1.6; margin: 20px 0; color: #fff; }
+        .rules li { margin-bottom: 10px; }
+        #play-btn {
+            background: transparent; color: #ff003c; border: 2px solid #ff003c;
+            padding: 15px 30px; font-size: 1.2rem; cursor: not-allowed;
+            text-transform: uppercase; font-weight: bold; width: 100%; transition: 0.3s;
+        }
+        #play-btn.ready { border-color: #0f0; color: #0f0; cursor: pointer; }
+        #play-btn.ready:hover { background: #0f0; color: #000; }
+
+        /* Quiz Screen */
+        #quiz-screen { display: none; }
+        .hud { display: flex; justify-content: space-between; font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px dashed #008f11; padding-bottom: 10px; }
+        #timer { color: #ff003c; font-weight: bold; font-size: 2rem; }
+        #potential-points { color: #14B8A6; }
+        #question-text { font-size: 1.8rem; margin-bottom: 30px; min-height: 80px; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .option-btn {
+            background: #050505; color: #fff; border: 1px solid #008f11;
+            padding: 20px; font-size: 1.1rem; cursor: pointer; transition: 0.2s;
+        }
+        .option-btn:hover { background: #008f11; }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+        .correct { background: #0f0 !important; color: #000 !important; font-weight: bold; }
+        .wrong { background: #ff003c !important; color: #fff !important; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="instruction-screen">
+        <h2>ROUND 1: THE GAUNTLET</h2>
+        <ul class="rules">
+            <li><strong>SPEED IS EVERYTHING:</strong> You have exactly 10 seconds to answer each question.</li>
+            <li><strong>SCORING:</strong> Every question is worth a maximum of 10 points.</li>
+            <li><strong>DEGRADATION:</strong> For every second that passes, the potential points drop by 1. If you answer at 9 seconds, you get 9 points. Answer at 1 second, you get 1 point.</li>
+            <li><strong>NO SECOND CHANCES:</strong> Once you click an option, your answer is locked.</li>
+        </ul>
+        <button id="play-btn" disabled>AWAITING ADMIN SIGNAL...</button>
+    </div>
+
+    <div class="container" id="quiz-screen">
+        <div class="hud">
+            <div><span id="timer">10.0</span>s</div>
+            <div>YIELD: <span id="potential-points">10</span> PTS</div>
+        </div>
+        <div id="question-text">LOADING...</div>
+        <div class="options-grid" id="options-container"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Connect to Firebase to listen for Admin Unlock
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
+            authDomain: "phantom-protocol-8b3f3.firebaseapp.com",
+            projectId: "phantom-protocol-8b3f3",
+            storageBucket: "phantom-protocol-8b3f3.firebasestorage.app",
+            messagingSenderId: "331865995163",
+            appId: "1:331865995163:web:b0d2710410548f147e533e"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+        const btnPlay = document.getElementById('play-btn');
+        
+        onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().gameActive) {
+                btnPlay.disabled = false;
+                btnPlay.innerText = "INITIATE ROUND";
+                btnPlay.classList.add('ready');
+            } else {
+                btnPlay.disabled = true;
+                btnPlay.innerText = "AWAITING ADMIN SIGNAL...";
+                btnPlay.classList.remove('ready');
+            }
+        });
+
+        const GAME_ID = "r1_quiz";
+        
+        const questions = [
+            { q: "🦁👑", o: ["Madagascar", "The Lion King", "Zootopia", "Kung Fu Panda"], a: 1 },
+            { q: "🚢❄️❤️", o: ["Jaws", "Moana", "Titanic", "Life of Pi"], a: 2 },
+            { q: "🧙⚡🦉", o: ["Percy Jackson", "Harry Potter", "Fantastic Beasts", "Narnia"], a: 1 },
+            { q: "🤖❤️🚀", o: ["Transformers", "Big Hero 6", "WALL-E", "Robots"], a: 2 },
+            { q: "What comes once in a minute, twice in a moment, but never in a thousand years?", o: ["Time", "The letter M", "Clock", "Second"], a: 1 },
+            { q: "I speak without a mouth and hear without ears. What am I?", o: ["Radio", "Echo", "Wind", "Shadow"], a: 1 },
+            { q: "Which month has 28 days?", o: ["February", "January", "December", "All of them"], a: 3 },
+            { q: "What gets wetter the more it dries?", o: ["Sponge", "Towel", "Water", "Soap"], a: 1 },
+            { q: "🎶👀💡", o: ["Blinding Lights", "Counting Stars", "Night Changes", "Stargazing"], a: 0 },
+            { q: "👶🦈", o: ["Shark Tale", "Baby Shark", "Finding Nemo", "Jaws"], a: 1 },
+            { q: "What has 13 hearts but no lungs?", o: ["Octopus", "Deck of Cards", "Alien", "Robot"], a: 1 },
+            { q: "👨‍🚀🌽🪐⏳", o: ["Gravity", "The Martian", "Interstellar", "Apollo 13"], a: 2 },
+            { q: "🦁👑🌅🐗🦓", o: ["Madagascar", "Zootopia", "The Lion King", "Jungle Book"], a: 2 },
+            { q: "🕒💰", o: ["Time is Money", "Money Time", "Rich Clock", "Save Time"], a: 0 },
+            { q: "🐦✋", o: ["Bird Catcher", "A bird in the hand", "Flying High", "Hold Tight"], a: 1 },
+            { q: "📖🐛", o: ["Reading Time", "Book Lover", "Bookworm", "Library Bug"], a: 2 },
+            { q: "🍎👁️👨‍⚕️❌", o: ["Apple Juice", "Healthy Eating", "An apple a day keeps the doctor away", "Fruit Doctor"], a: 2 },
+            { q: "🚫💨➡️🔥", o: ["Fire Safety", "Where there’s smoke, there’s fire", "Hot Air", "Smoke Alarm"], a: 1 },
+            { q: "⏰🐦🐛", o: ["Alarm Clock", "Early bird catches the worm", "Morning Walk", "Hungry Bird"], a: 1 },
+            { q: "🥚🧺", o: ["Basket Shopping", "Easter Eggs", "Don’t put all your eggs in one basket", "Egg Collection"], a: 2 },
+            { q: "🐎💧🚫", o: ["Horse Race", "You can lead a horse to water but can’t make it drink", "Horse Riding", "Water Horse"], a: 1 },
+            { q: "🌧️➡️☀️", o: ["Summer Rain", "After the storm comes sunshine", "Rainy Day", "Sunny Weather"], a: 1 },
+            { q: "👀➡️👀", o: ["Eye Contact", "See You Later", "Eye to Eye", "Look Around"], a: 2 },
+            { q: "🤫🪙", o: ["Silent Money", "Silence is Golden", "Rich and Quiet", "Hidden Treasure"], a: 1 },
+            { q: "🧊❄️💔", o: ["Cold Weather", "Break the Ice", "Frozen Heart", "Winter Love"], a: 1 },
+            { q: "🎂🍽️", o: ["Birthday Party", "Piece of Cake", "Dessert Time", "Sweet Treat"], a: 1 },
+            { q: "👐🌎", o: ["World Tour", "The World in Your Hands", "Earth Day", "Global Meeting"], a: 1 },
+            { q: "Which statement is the LIE?", o: ["YouTube was founded before Twitter.", "Google was originally called BackRub.", "The first YouTube video was uploaded in 2005.", "Instagram was created before Facebook."], a: 3 },
+            { q: "Which statement is the LIE?", o: ["The human body has 206 bones.", "Water boils at 100°C at sea level.", "Bats are blind.", "The Pacific Ocean is the largest ocean."], a: 2 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let timeRemaining = 10.0;
+        let timerInterval;
+        let currentPoints = 10;
+
+        const elements = {
+            screenInst: document.getElementById('instruction-screen'),
+            screenQuiz: document.getElementById('quiz-screen'),
+            question: document.getElementById('question-text'),
+            options: document.getElementById('options-container'),
+            timer: document.getElementById('timer'),
+            points: document.getElementById('potential-points')
+        };
+
+        btnPlay.addEventListener('click', () => {
+            elements.screenInst.style.display = 'none';
+            elements.screenQuiz.style.display = 'block';
+            loadQuestion();
+        });
+
+        function loadQuestion() {
+            if (currentQuestionIndex >= questions.length) {
+                elements.screenQuiz.innerHTML = "<h2>ROUND 1 COMPLETE</h2><p style='color:#fff'>Awaiting further instructions from the Command Center.</p>";
+                return;
+            }
+
+            const qData = questions[currentQuestionIndex];
+            elements.question.innerText = qData.q;
+            elements.options.innerHTML = '';
+            
+            timeRemaining = 10.0;
+            currentPoints = 10;
+            elements.points.innerText = currentPoints;
+            elements.timer.innerText = timeRemaining.toFixed(1);
+
+            qData.o.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.onclick = () => submitAnswer(index);
+                elements.options.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining -= 0.1;
+                currentPoints = Math.max(0, Math.ceil(timeRemaining));
+                
+                elements.timer.innerText = Math.max(0, timeRemaining).toFixed(1);
+                elements.points.innerText = currentPoints;
+
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitAnswer(-1); // Timeout
+                }
+            }, 100);
+        }
+
+        function submitAnswer(selectedIndex) {
+            clearInterval(timerInterval);
+            
+            const qData = questions[currentQuestionIndex];
+            const isCorrect = selectedIndex === qData.a;
+            const finalScore = isCorrect ? currentPoints : 0;
+
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (idx === qData.a) btn.classList.add('correct');
+                else if (idx === selectedIndex && !isCorrect) btn.classList.add('wrong');
+            });
+
+            if (finalScore > 0) {
+                window.parent.postMessage({
+                    type: 'PHANTOM_SCORE_UPDATE',
+                    gameId: `${GAME_ID}_q${currentQuestionIndex}`,
+                    score: finalScore
+                }, '*');
+            }
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                loadQuestion();
+            }, 2000);
+        }
+    </script>
+</body>
+</html>         

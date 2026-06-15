@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUEST COMMAND CENTER</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="gate-box" style="margin: 50px auto; max-width: 400px; position: relative;">
+        <h2>ADMIN COMMAND</h2>
+        <p>SET GLOBAL EVENT STAGE</p>
+        
+        <select id="round-select">
+            <option value="1">Round 1: Kahoot Quiz</option>
+            <option value="2">Round 2: Scavenger Hunt</option>
+            <option value="3">Round 3: Witty Captions</option>
+            <option value="4">Round 4: Funny Shark Tank</option>
+        </select>
+
+        <button id="btn-set-round" style="margin-bottom: 10px;">1. DEPLOY ROUND</button>
+        <button id="btn-unlock-game" style="background: #14B8A6; border: none; color: #fff;">2. UNLOCK PLAY BUTTON</button>
+        
+        <div id="admin-status" style="margin-top: 15px; color: var(--text-main);"></div></div>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>
