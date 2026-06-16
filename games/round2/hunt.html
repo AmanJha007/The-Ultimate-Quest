@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #050505;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            border: 1px solid #008f11;
+            padding: 30px;
+            background: #0a0a0a;
+            text-align: left;
+        }
+
+        h2 {
+            color: #14B8A6;
+            text-transform: uppercase;
+            margin-top: 0;
+            text-align: center;
+            border-bottom: 1px dashed #008f11;
+            padding-bottom: 15px;
+        }
+        
+        .rules-box {
+            border-left: 4px solid #ff003c;
+            padding-left: 15px;
+            margin-bottom: 25px;
+            color: #fff;
+            line-height: 1.6;
+            background: rgba(255, 0, 60, 0.05);
+            padding: 15px;
+        }
+
+        .highlight {
+            color: #ff003c;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .task-card {
+            background: #050505;
+            border: 1px solid #008f11;
+            padding: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: 0.2s;
+        }
+
+        .task-card:hover {
+            border-color: #14B8A6;
+            box-shadow: 0 0 10px rgba(20, 184, 166, 0.2);
+        }
+
+        .task-num {
+            color: #14B8A6;
+            font-weight: bold;
+            font-size: 1.5rem;
+            min-width: 35px;
+        }
+
+        .task-desc {
+            color: #fff;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        #hunt-screen {
+            display: none;
+        }
+
+        #play-btn {
+            background: transparent;
+            color: #ff003c;
+            border: 2px solid #ff003c;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            cursor: not-allowed;
+            text-transform: uppercase;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 20px;
+        }
+
+        #play-btn.ready {
+            border-color: #0f0;
+            color: #0f0;
+            cursor: pointer;
+        }
+
+        #play-btn.ready:hover {
+            background: #0f0;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="instruction-screen">
+        <h2>ROUND 2: SECURE ASSET RETRIEVAL</h2>
+        
+        <div class="rules-box">
+            <p><strong>MISSION BRIEF:</strong> You must locate physical assets and transmit visual proof to the secure WhatsApp channel.</p>
+            <p><strong>TRANSMISSION PROTOCOL:</strong> Every image MUST be captioned exactly like this:</p>
+            <p class="highlight" style="text-align: center; margin: 15px 0;">TeamNumber-TaskNumber-Name</p>
+            <p style="text-align: center; color: #14B8A6;">(Example: T4-03-Aman)</p>
+            <p style="margin-top: 15px;"><strong>WARNING:</strong> Failure to format the caption correctly means ZERO points will be awarded by the judges.</p>
+        </div>
+
+        <button id="play-btn" disabled>AWAITING ADMIN SIGNAL...</button>
+    </div>
+
+    <div class="container" id="hunt-screen">
+        <h2>ACTIVE TARGETS</h2>
+        
+        <div class="rules-box" style="border-left-color: #14B8A6; background: rgba(20, 184, 166, 0.05);">
+            <p><strong>WHATSAPP FORMAT: <span class="highlight" style="color: #14B8A6;">TeamNumber-TaskNumber-Name</span></strong></p>
+        </div>
+
+        <div class="task-grid" id="task-list"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
+            authDomain: "phantom-protocol-8b3f3.firebaseapp.com",
+            projectId: "phantom-protocol-8b3f3",
+            storageBucket: "phantom-protocol-8b3f3.firebasestorage.app",
+            messagingSenderId: "331865995163",
+            appId: "1:331865995163:web:b0d2710410548f147e533e"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+        const btnPlay = document.getElementById('play-btn');
+        const screenInst = document.getElementById('instruction-screen');
+        const screenHunt = document.getElementById('hunt-screen');
+        const taskList = document.getElementById('task-list');
+
+        const tasks = [
+            "Bring the weirdest item in your bag.",
+            "Bring something that costs less than ₹10.",
+            "Bring something that’s definitely not yours.",
+            "Bring something that proves you’re an engineering student.",
+            "Bring the oldest receipt you can find.",
+            "Bring something that is broken but still kept.",
+            "Something with a barcode.",
+            "Something with your name on it.",
+            "Bring something transparent.",
+            "Bring something blue.",
+            "Bring something edible.",
+            "Bring something with a crack in it."
+        ];
+
+        onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().gameActive) {
+                btnPlay.disabled = false;
+                btnPlay.innerText = "INITIATE ROUND";
+                btnPlay.classList.add('ready');
+            } else {
+                btnPlay.disabled = true;
+                btnPlay.innerText = "AWAITING ADMIN SIGNAL...";
+                btnPlay.classList.remove('ready');
+            }
+        });
+
+        btnPlay.addEventListener('click', () => {
+            screenInst.style.display = 'none';
+            screenHunt.style.display = 'block';
+            renderTasks();
+        });
+
+        function renderTasks() {
+            taskList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const card = document.createElement('div');
+                card.className = 'task-card';
+                
+                const num = document.createElement('div');
+                num.className = 'task-num';
+                num.innerText = (index + 1).toString().padStart(2, '0');
+                
+                const desc = document.createElement('div');
+                desc.className = 'task-desc';
+                desc.innerText = task;
+
+                card.appendChild(num);
+                card.appendChild(desc);
+                taskList.appendChild(card);
+            });
+        }
+    </script>
+</body>

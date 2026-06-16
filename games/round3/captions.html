@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #050505; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 800px; border: 1px solid #008f11; padding: 30px; background: #0a0a0a; text-align: center; }
+        h2 { color: #14B8A6; text-transform: uppercase; margin-top: 0; }
+        .image-display { max-width: 100%; max-height: 400px; object-fit: contain; margin-bottom: 20px; border: 1px solid #14B8A6; display: block; margin-left: auto; margin-right: auto; }
+        input[type="text"] { width: 90%; padding: 15px; background: #000; border: 1px solid #0f0; color: #0f0; font-family: inherit; font-size: 1.2rem; margin-bottom: 20px; text-align: center; }
+        button { background: #000; color: #0f0; border: 1px solid #0f0; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: #0f0; color: #000; }
+        button:disabled { border-color: #ff003c; color: #ff003c; cursor: not-allowed; opacity: 0.5; }
+        .hud { display: flex; justify-content: space-between; font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px dashed #008f11; padding-bottom: 10px; }
+        #timer-input, #timer-vote { color: #ff003c; font-weight: bold; font-size: 2rem; }
+        .voting-grid { display: grid; grid-template-columns: 1fr; gap: 10px; text-align: left; margin-top: 20px; }
+        .vote-btn { border: 1px solid #14B8A6; background: transparent; color: #fff; padding: 15px; cursor: pointer; text-align: left; font-size: 1.1rem; }
+        .vote-btn:hover { background: #14B8A6; color: #000; }
+        .screen { display: none; }
+        .active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="container screen active" id="instruction-screen">
+        <h2>ROUND 3: WITTY CAPTIONS</h2>
+        <div style="text-align: left; color: #fff; line-height: 1.6; margin-bottom: 20px;">
+            <p><strong>PHASE 1 (15s):</strong> Analyze the visual asset. Submit your funniest caption.</p>
+            <p><strong>PHASE 2 (15s):</strong> Review all submissions. Vote for the best one.</p>
+            <p style="color: #ff003c;"><strong>WARNING:</strong> You cannot vote for your own Triad Unit.</p>
+            <p style="color: #14B8A6;"><strong>REWARDS:</strong> 1st = 10 PTS | 2nd = 7 PTS | 3rd = 5 PTS</p>
+        </div>
+    </div>
+
+    <div class="container screen" id="input-screen">
+        <div class="hud">
+            <div>SUBMISSION PHASE</div>
+            <div><span id="timer-input">15.0</span>s</div>
+        </div>
+        <img id="current-image-input" class="image-display" src="">
+        <input type="text" id="caption-input" placeholder="ENTER CAPTION HERE..." autocomplete="off">
+        <button id="btn-submit-caption">TRANSMIT</button>
+    </div>
+
+    <div class="container screen" id="voting-screen">
+        <div class="hud">
+            <div>VOTING PHASE</div>
+            <div><span id="timer-vote">15.0</span>s</div>
+        </div>
+        <img id="current-image-vote" class="image-display" src="">
+        <div class="voting-grid" id="voting-list"></div>
+    </div>
+
+    <div class="container screen" id="wait-screen">
+        <h2>TRANSMISSION LOGGED</h2>
+        <p style="color: #fff; margin-top: 20px;">Awaiting network synchronization for the next phase...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeFirestore, doc, onSnapshot, collection, query, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
+            authDomain: "phantom-protocol-8b3f3.firebaseapp.com",
+            projectId: "phantom-protocol-8b3f3",
+            storageBucket: "phantom-protocol-8b3f3.firebasestorage.app",
+            messagingSenderId: "331865995163",
+            appId: "1:331865995163:web:b0d2710410548f147e533e"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+        const sessionData = localStorage.getItem('phantom_session');
+        const user = sessionData ? JSON.parse(sessionData) : { triad: 'UNKNOWN' };
+
+        const screens = {
+            inst: document.getElementById('instruction-screen'),
+            input: document.getElementById('input-screen'),
+            vote: document.getElementById('voting-screen'),
+            wait: document.getElementById('wait-screen')
+        };
+
+        function switchScreen(screenKey) {
+            Object.values(screens).forEach(s => s.classList.remove('active'));
+            screens[screenKey].classList.add('active');
+        }
+
+        let r3Timer;
+        function startVisualTimer(elementId) {
+            let time = 15.0;
+            document.getElementById(elementId).innerText = time.toFixed(1);
+            clearInterval(r3Timer);
+            r3Timer = setInterval(() => {
+                time -= 0.1;
+                if(time <= 0) {
+                    time = 0;
+                    clearInterval(r3Timer);
+                }
+                document.getElementById(elementId).innerText = time.toFixed(1);
+            }, 100);
+        }
+
+        const btnSubmit = document.getElementById('btn-submit-caption');
+        const inputCap = document.getElementById('caption-input');
+
+        btnSubmit.addEventListener('click', async () => {
+            const capText = inputCap.value.trim();
+            if(!capText) return;
+            btnSubmit.disabled = true;
+            inputCap.disabled = true;
+            
+            const capRef = doc(db, "r3_captions", user.triad);
+            await setDoc(capRef, {
+                triad: user.triad,
+                alias: user.alias,
+                caption: capText,
+                votes: 0
+            });
+            
+            switchScreen('wait');
+        });
+
+        onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if(data.r3ImageIndex) {
+                    document.getElementById('current-image-input').src = `assets/${data.r3ImageIndex}.jpg`;
+                    document.getElementById('current-image-vote').src = `assets/${data.r3ImageIndex}.jpg`;
+                }
+                if(data.r3Phase === 'input') {
+                    switchScreen('input');
+                    startVisualTimer('timer-input');
+                    inputCap.value = '';
+                    inputCap.disabled = false;
+                    btnSubmit.disabled = false;
+                } else if(data.r3Phase === 'vote') {
+                    switchScreen('vote');
+                    startVisualTimer('timer-vote');
+                } else if(data.r3Phase === 'wait') {
+                    switchScreen('wait');
+                }
+            }
+        });
+
+        onSnapshot(query(collection(db, "r3_captions")), (snapshot) => {
+            const list = document.getElementById('voting-list');
+            list.innerHTML = '';
+            snapshot.forEach((docSnap) => {
+                const d = docSnap.data();
+                if(d.triad !== user.triad) {
+                    const btn = document.createElement('button');
+                    btn.className = 'vote-btn';
+                    btn.innerText = d.caption;
+                    btn.onclick = async () => {
+                        const buttons = document.querySelectorAll('.vote-btn');
+                        buttons.forEach(b => b.disabled = true);
+                        const capRef = doc(db, "r3_captions", d.triad);
+                        await setDoc(capRef, { votes: increment(1) }, { merge: true });
+                        switchScreen('wait');
+                    };
+                    list.appendChild(btn);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

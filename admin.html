@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <div class="gate-box" style="margin: 50px auto; max-width: 400px; position: relative;">
+    <div class="gate-box" style="margin: 20px auto; max-width: 400px; position: relative;">
         <h2>ADMIN COMMAND</h2>
         <p>SET GLOBAL EVENT STAGE</p>
         
@@ -21,7 +21,53 @@
         <button id="btn-set-round" style="margin-bottom: 10px;">1. DEPLOY ROUND</button>
         <button id="btn-unlock-game" style="background: #14B8A6; border: none; color: #fff;">2. UNLOCK PLAY BUTTON</button>
         
-        <div id="admin-status" style="margin-top: 15px; color: var(--text-main);"></div></div>
+        <div id="admin-status" style="margin-top: 15px; color: var(--text-main);"></div>
+    </div>
+
+    <div class="gate-box" style="margin: 20px auto; max-width: 400px; position: relative;">
+        <h2>MANUAL OVERRIDE</h2>
+        <p>INJECT SECURE ASSET SCORES</p>
+        
+        <select id="manual-triad-select">
+            <option value="" disabled selected>Select Triad Unit</option>
+            <option value="T1">Unit 01</option>
+            <option value="T2">Unit 02</option>
+            <option value="T3">Unit 03</option>
+            <option value="T4">Unit 04</option>
+            <option value="T5">Unit 05</option>
+            <option value="T6">Unit 06</option>
+            <option value="T7">Unit 07</option>
+            <option value="T8">Unit 08</option>
+            <option value="T9">Unit 09</option>
+            <option value="T10">Unit 10</option>
+            <option value="T11">Unit 11</option>
+            <option value="T12">Unit 12</option>
+            <option value="T13">Unit 13</option>
+            <option value="T14">Unit 14</option>
+            <option value="T15">Unit 15</option>
+            <option value="T16">Unit 16</option>
+            <option value="T17">Unit 17</option>
+        </select>
+
+        <input type="number" id="manual-points" placeholder="ENTER POINTS (e.g., 50)" autocomplete="off" style="width: 100%; margin-bottom: 1rem; padding: 0.75rem; background: transparent; border: 1px solid var(--text-main); color: var(--text-main); font-family: var(--font-stack); font-size: 1rem; text-align: center;">
+
+        <button id="btn-inject-score" style="background: #ff003c; border: none; color: #fff;">INJECT POINTS</button>
+        
+        <div id="override-status" style="margin-top: 15px; color: var(--text-main);"></div>
+    </div>
+
+    <div class="gate-box" style="margin: 20px auto; max-width: 400px; position: relative;">
+        <h2>ROUND 3 CONTROLS</h2>
+        <p>WITTY CAPTIONS MASTER CLOCK</p>
+        
+        <input type="number" id="r3-image-index" placeholder="IMAGE NUMBER (1-20)" autocomplete="off" style="width: 100%; margin-bottom: 1rem; padding: 0.75rem; background: transparent; border: 1px solid var(--text-main); color: var(--text-main); font-family: var(--font-stack); font-size: 1rem; text-align: center;">
+
+        <button id="btn-r3-input" style="background: #14B8A6; border: none; color: #fff; margin-bottom: 10px;">1. START SUBMISSIONS (15s)</button>
+        <button id="btn-r3-vote" style="background: #ff003c; border: none; color: #fff; margin-bottom: 10px;">2. START VOTING (15s)</button>
+        <button id="btn-r3-award" style="background: #0f0; border: none; color: #000;">3. CALCULATE & AWARD</button>
+        
+        <div id="r3-status" style="margin-top: 15px; color: var(--text-main);"></div>
+    </div>
 
     <script type="module" src="js/admin.js"></script>
 </body>
