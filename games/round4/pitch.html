@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #050505; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh;}
+        .container { width: 100%; max-width: 800px; border: 1px solid #008f11; padding: 40px; background: #0a0a0a; text-align: center; box-shadow: 0 0 20px rgba(0, 143, 17, 0.2); }
+        h2 { color: #14B8A6; text-transform: uppercase; margin-top: 0; font-size: 2.5rem; letter-spacing: 2px; border-bottom: 2px dashed #008f11; padding-bottom: 20px;}
+        .brief-box { text-align: left; margin: 30px 0; background: rgba(20, 184, 166, 0.05); border-left: 4px solid #14B8A6; padding: 20px; }
+        .brief-box h3 { color: #fff; margin-top: 0; font-size: 1.5rem; }
+        .rules-list { color: #fff; line-height: 1.8; font-size: 1.2rem; list-style-type: square; padding-left: 20px; }
+        .highlight { color: #ff003c; font-weight: bold; }
+        .status-indicator { margin-top: 30px; font-size: 1.5rem; font-weight: bold; color: #ff003c; border: 2px solid #ff003c; padding: 15px; text-transform: uppercase; letter-spacing: 2px; }
+        .status-indicator.live { color: #0f0; border-color: #0f0; box-shadow: 0 0 15px #0f0; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 5px #0f0; } 50% { box-shadow: 0 0 20px #0f0; } 100% { box-shadow: 0 0 5px #0f0; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>ROUND 4: FUNNY SHARK TANK</h2>
+        
+        <div class="brief-box">
+            <h3>EXECUTIVE DIRECTIVE</h3>
+            <ul class="rules-list">
+                <li><span class="highlight">QUALIFICATION:</span> Only the Top 4 Triad Units on the Global Leaderboard advance to this final stage.</li>
+                <li><span class="highlight">THE OBJECTIVE:</span> Invent and pitch a hilariously absurd product to the panel of Judges.</li>
+                <li><span class="highlight">PREPARATION:</span> You have exactly 3 minutes to finalize your product name, concept, and pitch strategy.</li>
+                <li><span class="highlight">EXECUTION:</span> Pitches will be delivered live on the main transmission channel. Screen sharing for visual assets is authorized and encouraged.</li>
+                <li><span class="highlight">VICTORY CONDITION:</span> The pitch generating the maximum comedic yield wins the event.</li>
+            </ul>
+        </div>
+
+        <div class="status-indicator" id="round-status">AWAITING ADMIN INITIALIZATION...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
+            authDomain: "phantom-protocol-8b3f3.firebaseapp.com",
+            projectId: "phantom-protocol-8b3f3",
+            storageBucket: "phantom-protocol-8b3f3.firebasestorage.app",
+            messagingSenderId: "331865995163",
+            appId: "1:331865995163:web:b0d2710410548f147e533e"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+        const statusEl = document.getElementById('round-status');
+
+        onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().gameActive && docSnap.data().currentRound === 4) {
+                statusEl.innerText = "ROUND 4 IS LIVE. PREPARE YOUR PITCH.";
+                statusEl.classList.add('live');
+            } else {
+                statusEl.innerText = "AWAITING ADMIN INITIALIZATION...";
+                statusEl.classList.remove('live');
+            }
+        });
+    </script>
+</body>
+</html>
