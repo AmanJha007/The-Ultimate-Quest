@@ -73,14 +73,14 @@ btnR3Input.addEventListener('click', async () => {
     await clearAndStartR3(idx);
     r3Status.innerText = `[SYSTEM]: ASSET ${idx} SUBMISSIONS OPEN`;
     r3Status.style.color = "#14B8A6";
-    setTimeout(() => { setR3State('wait'); r3Status.innerText = `[SYSTEM]: SUBMISSIONS CLOSED`; }, 15000);
+    setTimeout(() => { setR3State('wait'); r3Status.innerText = `[SYSTEM]: SUBMISSIONS CLOSED`; }, 40000);
 });
 
 btnR3Vote.addEventListener('click', async () => {
     await setR3State('vote');
     r3Status.innerText = `[SYSTEM]: VOTING OPEN`;
     r3Status.style.color = "#ff003c";
-    setTimeout(() => { setR3State('wait'); r3Status.innerText = `[SYSTEM]: VOTING CLOSED`; }, 15000);
+    setTimeout(() => { setR3State('wait'); r3Status.innerText = `[SYSTEM]: VOTING CLOSED`; }, 30000);
 });
 
 btnR3Award.addEventListener('click', async () => {
