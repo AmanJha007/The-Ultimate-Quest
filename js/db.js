@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { initializeFirestore, doc, setDoc, onSnapshot, collection, query, increment, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initializeFirestore, doc, setDoc, onSnapshot, collection, query, increment, getDocs, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
@@ -96,11 +96,16 @@ export async function submitR3Caption(caption) {
     if (!sessionData) return;
     const user = JSON.parse(sessionData);
     const capRef = doc(db, "r3_captions", user.triad);
+    
+    const docSnap = await getDoc(capRef);
+    if (docSnap.exists()) return;
+
     await setDoc(capRef, {
         triad: user.triad,
         alias: user.alias,
         caption: caption,
-        votes: 0
+        votes: 0,
+        timestamp: Date.now()
     });
 }
 
@@ -129,7 +134,13 @@ export async function awardR3Winners() {
     const snapshot = await getDocs(collection(db, "r3_captions"));
     const captions = [];
     snapshot.forEach((d) => captions.push(d.data()));
-    captions.sort((a, b) => b.votes - a.votes);
+    
+    captions.sort((a, b) => {
+        if (b.votes === a.votes) {
+            return (a.timestamp || 0) - (b.timestamp || 0);
+        }
+        return b.votes - a.votes;
+    });
     
     const top3 = captions.slice(0, 3);
     const points = [10, 7, 5];
