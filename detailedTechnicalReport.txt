@@ -213,8 +213,23 @@ The Cause: GitHub deprecated standard password authentication for terminal opera
 
 The Solution: You navigated the transition from password auth to Personal Access Tokens (PATs) and configured the Git credential manager (git config --global credential.helper store) within the Linux subsystem. This shows a deep understanding of terminal security protocols and environment configuration.
 Changes made in the website based on suggestions given during Dry Run:
+
 A. Round 1
   Updated the content and removed the previous content.
-  Could NOT implement the Average points rule for each team (Not possible)
+  Could NOT implement the Average points rule for each team (Not possible).
+
 B. Round 2
- 
+  Updated the Task format, now the participants could see only one task at the time. 
+  Each task will have 1 minute timer, in this one mimute the participants have to hunt for the object,take the picture, format it and then upload on the whatsApp GC.
+  once the timer runs out the next task would be displayed.
+  Points would be awarded(manually by the backend OCs) to first 3 teams which have completed that task.
+
+C. Round 3
+  In this round only one caption per team would be accepted for a particular image.
+  The timer for submiting response is increased from 15 seconds to 40 seconds and voting time has been increased to 30 seconds.
+  A participant can not vote for his team. the top 3 team with most votes would be awarded 10,7 and 5 points respectively.
+
+D. Round 4 
+No changes were made as this round would be handled manually and there is no need of the website.
+
+Is there any other changes which I missed ya phir itna theek h?
