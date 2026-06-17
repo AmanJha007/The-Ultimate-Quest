@@ -26,9 +26,9 @@
     <div class="container screen active" id="instruction-screen">
         <h2>ROUND 3: WITTY CAPTIONS</h2>
         <div style="text-align: left; color: #fff; line-height: 1.6; margin-bottom: 20px;">
-            <p><strong>PHASE 1 (15s):</strong> Analyze the visual asset. Submit your funniest caption.</p>
-            <p><strong>PHASE 2 (15s):</strong> Review all submissions. Vote for the best one.</p>
-            <p style="color: #ff003c;"><strong>WARNING:</strong> You cannot vote for your own Triad Unit.</p>
+            <p><strong>PHASE 1 (40s):</strong> Collaborate with your Triad Unit. Only ONE submission per team is permitted. Once transmitted, all teammates' screens will lock.</p>
+            <p><strong>PHASE 2 (30s):</strong> Review all submissions. You cannot vote for your own Triad Unit.</p>
+            <p style="color: #ff003c;"><strong>TIE-BREAKER PROTOCOL:</strong> In the event of a voting tie, the team with the fastest submission timestamp takes priority.</p>
             <p style="color: #14B8A6;"><strong>REWARDS:</strong> 1st = 10 PTS | 2nd = 7 PTS | 3rd = 5 PTS</p>
         </div>
     </div>
@@ -36,7 +36,7 @@
     <div class="container screen" id="input-screen">
         <div class="hud">
             <div>SUBMISSION PHASE</div>
-            <div><span id="timer-input">15.0</span>s</div>
+            <div><span id="timer-input">40.0</span>s</div>
         </div>
         <img id="current-image-input" class="image-display" src="">
         <input type="text" id="caption-input" placeholder="ENTER CAPTION HERE..." autocomplete="off">
@@ -46,7 +46,7 @@
     <div class="container screen" id="voting-screen">
         <div class="hud">
             <div>VOTING PHASE</div>
-            <div><span id="timer-vote">15.0</span>s</div>
+            <div><span id="timer-vote">30.0</span>s</div>
         </div>
         <img id="current-image-vote" class="image-display" src="">
         <div class="voting-grid" id="voting-list"></div>
@@ -60,6 +60,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { initializeFirestore, doc, onSnapshot, collection, query, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { submitR3Caption } from "../../js/db.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
@@ -89,8 +90,8 @@
         }
 
         let r3Timer;
-        function startVisualTimer(elementId) {
-            let time = 15.0;
+        function startVisualTimer(elementId, duration) {
+            let time = duration;
             document.getElementById(elementId).innerText = time.toFixed(1);
             clearInterval(r3Timer);
             r3Timer = setInterval(() => {
@@ -112,14 +113,7 @@
             btnSubmit.disabled = true;
             inputCap.disabled = true;
             
-            const capRef = doc(db, "r3_captions", user.triad);
-            await setDoc(capRef, {
-                triad: user.triad,
-                alias: user.alias,
-                caption: capText,
-                votes: 0
-            });
-            
+            await submitR3Caption(capText);
             switchScreen('wait');
         });
 
@@ -132,13 +126,13 @@
                 }
                 if(data.r3Phase === 'input') {
                     switchScreen('input');
-                    startVisualTimer('timer-input');
+                    startVisualTimer('timer-input', 40.0);
                     inputCap.value = '';
                     inputCap.disabled = false;
                     btnSubmit.disabled = false;
                 } else if(data.r3Phase === 'vote') {
                     switchScreen('vote');
-                    startVisualTimer('timer-vote');
+                    startVisualTimer('timer-vote', 30.0);
                 } else if(data.r3Phase === 'wait') {
                     switchScreen('wait');
                 }
@@ -148,9 +142,13 @@
         onSnapshot(query(collection(db, "r3_captions")), (snapshot) => {
             const list = document.getElementById('voting-list');
             list.innerHTML = '';
+            let teamHasSubmitted = false;
+
             snapshot.forEach((docSnap) => {
                 const d = docSnap.data();
-                if(d.triad !== user.triad) {
+                if(d.triad === user.triad) {
+                    teamHasSubmitted = true;
+                } else {
                     const btn = document.createElement('button');
                     btn.className = 'vote-btn';
                     btn.innerText = d.caption;
@@ -164,6 +162,10 @@
                     list.appendChild(btn);
                 }
             });
+
+            if (teamHasSubmitted && document.getElementById('input-screen').classList.contains('active')) {
+                switchScreen('wait');
+            }
         });
     </script>
 </body>
