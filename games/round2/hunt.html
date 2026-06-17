@@ -49,43 +49,38 @@
             font-size: 1.1rem;
         }
 
-        .task-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
         .task-card {
             background: #050505;
-            border: 1px solid #008f11;
-            padding: 15px;
+            border: 1px solid #14B8A6;
+            padding: 30px;
             display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            transition: 0.2s;
-        }
-
-        .task-card:hover {
-            border-color: #14B8A6;
-            box-shadow: 0 0 10px rgba(20, 184, 166, 0.2);
-        }
-
-        .task-num {
-            color: #14B8A6;
-            font-weight: bold;
-            font-size: 1.5rem;
-            min-width: 35px;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.1);
         }
 
         .task-desc {
             color: #fff;
-            font-size: 1.1rem;
+            font-size: 1.8rem;
             line-height: 1.4;
+            font-weight: bold;
         }
 
-        #hunt-screen {
-            display: none;
+        .hud { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 1.5rem; 
+            margin-bottom: 20px; 
+            border-bottom: 1px dashed #008f11; 
+            padding-bottom: 10px; 
         }
+
+        #task-num-display { color: #14B8A6; font-weight: bold; }
+        #hunt-timer { color: #ff003c; font-weight: bold; font-size: 2rem; }
+
+        #hunt-screen { display: none; }
 
         #play-btn {
             background: transparent;
@@ -119,24 +114,29 @@
         <h2>ROUND 2: SECURE ASSET RETRIEVAL</h2>
         
         <div class="rules-box">
-            <p><strong>MISSION BRIEF:</strong> You must locate physical assets and transmit visual proof to the secure WhatsApp channel.</p>
-            <p><strong>TRANSMISSION PROTOCOL:</strong> Every image MUST be captioned exactly like this:</p>
+            <p><strong>MISSION BRIEF:</strong> You have exactly 60 seconds per target to locate the asset and transmit visual proof.</p>
+            <p><strong>TRANSMISSION PROTOCOL:</strong> Every image MUST be captioned exactly like this in the WhatsApp channel:</p>
             <p class="highlight" style="text-align: center; margin: 15px 0;">TeamNumber-TaskNumber-Name</p>
             <p style="text-align: center; color: #14B8A6;">(Example: T4-03-Aman)</p>
-            <p style="margin-top: 15px;"><strong>WARNING:</strong> Failure to format the caption correctly means ZERO points will be awarded by the judges.</p>
+            <p style="margin-top: 15px;"><strong>WARNING:</strong> When the timer hits zero, the target changes. Late transmissions receive ZERO points.</p>
         </div>
 
         <button id="play-btn" disabled>AWAITING ADMIN SIGNAL...</button>
     </div>
 
     <div class="container" id="hunt-screen">
-        <h2>ACTIVE TARGETS</h2>
+        <div class="hud">
+            <div id="task-num-display">TASK 01 / 08</div>
+            <div><span id="hunt-timer">60.0</span>s</div>
+        </div>
         
-        <div class="rules-box" style="border-left-color: #14B8A6; background: rgba(20, 184, 166, 0.05);">
-            <p><strong>WHATSAPP FORMAT: <span class="highlight" style="color: #14B8A6;">TeamNumber-TaskNumber-Name</span></strong></p>
+        <div class="rules-box" style="border-left-color: #14B8A6; background: rgba(20, 184, 166, 0.05); margin-bottom: 30px;">
+            <p style="text-align: center;"><strong>WHATSAPP FORMAT: <span class="highlight" style="color: #14B8A6;">TeamNumber-TaskNumber-Name</span></strong></p>
         </div>
 
-        <div class="task-grid" id="task-list"></div>
+        <div class="task-card">
+            <div id="current-task-text" class="task-desc">LOADING...</div>
+        </div>
     </div>
 
     <script type="module">
@@ -158,7 +158,9 @@
         const btnPlay = document.getElementById('play-btn');
         const screenInst = document.getElementById('instruction-screen');
         const screenHunt = document.getElementById('hunt-screen');
-        const taskList = document.getElementById('task-list');
+        const taskNumDisplay = document.getElementById('task-num-display');
+        const huntTimerDisplay = document.getElementById('hunt-timer');
+        const currentTaskText = document.getElementById('current-task-text');
 
         const tasks = [
             "Bring the weirdest item in your bag.",
@@ -168,12 +170,12 @@
             "Bring the oldest receipt you can find.",
             "Bring something that is broken but still kept.",
             "Something with a barcode.",
-            "Something with your name on it.",
-            "Bring something transparent.",
-            "Bring something blue.",
-            "Bring something edible.",
-            "Bring something with a crack in it."
+            "Something with your name on it."
         ];
+
+        let currentTaskIndex = 0;
+        let timeRemaining = 60.0;
+        let huntTimer;
 
         onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
             if (docSnap.exists() && docSnap.data().gameActive) {
@@ -190,27 +192,33 @@
         btnPlay.addEventListener('click', () => {
             screenInst.style.display = 'none';
             screenHunt.style.display = 'block';
-            renderTasks();
+            currentTaskIndex = 0;
+            loadTask();
         });
 
-        function renderTasks() {
-            taskList.innerHTML = '';
-            tasks.forEach((task, index) => {
-                const card = document.createElement('div');
-                card.className = 'task-card';
-                
-                const num = document.createElement('div');
-                num.className = 'task-num';
-                num.innerText = (index + 1).toString().padStart(2, '0');
-                
-                const desc = document.createElement('div');
-                desc.className = 'task-desc';
-                desc.innerText = task;
+        function loadTask() {
+            if (currentTaskIndex >= tasks.length) {
+                screenHunt.innerHTML = "<h2>HUNT COMPLETE</h2><p style='color:#fff; text-align:center; margin-top: 20px; font-size: 1.2rem;'>All targets exhausted. Awaiting final assessment from the Command Center.</p>";
+                return;
+            }
 
-                card.appendChild(num);
-                card.appendChild(desc);
-                taskList.appendChild(card);
-            });
+            timeRemaining = 60.0;
+            taskNumDisplay.innerText = `TASK ${(currentTaskIndex + 1).toString().padStart(2, '0')} / 08`;
+            currentTaskText.innerText = tasks[currentTaskIndex];
+            huntTimerDisplay.innerText = timeRemaining.toFixed(1);
+
+            clearInterval(huntTimer);
+            huntTimer = setInterval(() => {
+                timeRemaining -= 0.1;
+                if (timeRemaining <= 0) {
+                    timeRemaining = 0;
+                    clearInterval(huntTimer);
+                    currentTaskIndex++;
+                    loadTask();
+                }
+                huntTimerDisplay.innerText = Math.max(0, timeRemaining).toFixed(1);
+            }, 100);
         }
     </script>
 </body>
+</html>
