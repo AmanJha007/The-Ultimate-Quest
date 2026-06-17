@@ -24,7 +24,6 @@
         }
         h2 { color: #14B8A6; text-transform: uppercase; margin-top: 0; }
         
-        /* Instruction Screen */
         #instruction-screen { display: block; }
         .rules { text-align: left; line-height: 1.6; margin: 20px 0; color: #fff; }
         .rules li { margin-bottom: 10px; }
@@ -36,7 +35,6 @@
         #play-btn.ready { border-color: #0f0; color: #0f0; cursor: pointer; }
         #play-btn.ready:hover { background: #0f0; color: #000; }
 
-        /* Quiz Screen */
         #quiz-screen { display: none; }
         .hud { display: flex; justify-content: space-between; font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px dashed #008f11; padding-bottom: 10px; }
         #timer { color: #ff003c; font-weight: bold; font-size: 2rem; }
@@ -80,7 +78,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { initializeFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Connect to Firebase to listen for Admin Unlock
         const firebaseConfig = {
             apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
             authDomain: "phantom-protocol-8b3f3.firebaseapp.com",
@@ -109,35 +106,18 @@
         const GAME_ID = "r1_quiz";
         
         const questions = [
-            { q: "🦁👑", o: ["Madagascar", "The Lion King", "Zootopia", "Kung Fu Panda"], a: 1 },
-            { q: "🚢❄️❤️", o: ["Jaws", "Moana", "Titanic", "Life of Pi"], a: 2 },
-            { q: "🧙⚡🦉", o: ["Percy Jackson", "Harry Potter", "Fantastic Beasts", "Narnia"], a: 1 },
-            { q: "🤖❤️🚀", o: ["Transformers", "Big Hero 6", "WALL-E", "Robots"], a: 2 },
-            { q: "What comes once in a minute, twice in a moment, but never in a thousand years?", o: ["Time", "The letter M", "Clock", "Second"], a: 1 },
-            { q: "I speak without a mouth and hear without ears. What am I?", o: ["Radio", "Echo", "Wind", "Shadow"], a: 1 },
-            { q: "Which month has 28 days?", o: ["February", "January", "December", "All of them"], a: 3 },
-            { q: "What gets wetter the more it dries?", o: ["Sponge", "Towel", "Water", "Soap"], a: 1 },
-            { q: "🎶👀💡", o: ["Blinding Lights", "Counting Stars", "Night Changes", "Stargazing"], a: 0 },
-            { q: "👶🦈", o: ["Shark Tale", "Baby Shark", "Finding Nemo", "Jaws"], a: 1 },
-            { q: "What has 13 hearts but no lungs?", o: ["Octopus", "Deck of Cards", "Alien", "Robot"], a: 1 },
-            { q: "👨‍🚀🌽🪐⏳", o: ["Gravity", "The Martian", "Interstellar", "Apollo 13"], a: 2 },
-            { q: "🦁👑🌅🐗🦓", o: ["Madagascar", "Zootopia", "The Lion King", "Jungle Book"], a: 2 },
-            { q: "🕒💰", o: ["Time is Money", "Money Time", "Rich Clock", "Save Time"], a: 0 },
-            { q: "🐦✋", o: ["Bird Catcher", "A bird in the hand", "Flying High", "Hold Tight"], a: 1 },
-            { q: "📖🐛", o: ["Reading Time", "Book Lover", "Bookworm", "Library Bug"], a: 2 },
-            { q: "🍎👁️👨‍⚕️❌", o: ["Apple Juice", "Healthy Eating", "An apple a day keeps the doctor away", "Fruit Doctor"], a: 2 },
-            { q: "🚫💨➡️🔥", o: ["Fire Safety", "Where there’s smoke, there’s fire", "Hot Air", "Smoke Alarm"], a: 1 },
-            { q: "⏰🐦🐛", o: ["Alarm Clock", "Early bird catches the worm", "Morning Walk", "Hungry Bird"], a: 1 },
-            { q: "🥚🧺", o: ["Basket Shopping", "Easter Eggs", "Don’t put all your eggs in one basket", "Egg Collection"], a: 2 },
-            { q: "🐎💧🚫", o: ["Horse Race", "You can lead a horse to water but can’t make it drink", "Horse Riding", "Water Horse"], a: 1 },
-            { q: "🌧️➡️☀️", o: ["Summer Rain", "After the storm comes sunshine", "Rainy Day", "Sunny Weather"], a: 1 },
-            { q: "👀➡️👀", o: ["Eye Contact", "See You Later", "Eye to Eye", "Look Around"], a: 2 },
-            { q: "🤫🪙", o: ["Silent Money", "Silence is Golden", "Rich and Quiet", "Hidden Treasure"], a: 1 },
-            { q: "🧊❄️💔", o: ["Cold Weather", "Break the Ice", "Frozen Heart", "Winter Love"], a: 1 },
-            { q: "🎂🍽️", o: ["Birthday Party", "Piece of Cake", "Dessert Time", "Sweet Treat"], a: 1 },
-            { q: "👐🌎", o: ["World Tour", "The World in Your Hands", "Earth Day", "Global Meeting"], a: 1 },
-            { q: "Which statement is the LIE?", o: ["YouTube was founded before Twitter.", "Google was originally called BackRub.", "The first YouTube video was uploaded in 2005.", "Instagram was created before Facebook."], a: 3 },
-            { q: "Which statement is the LIE?", o: ["The human body has 206 bones.", "Water boils at 100°C at sea level.", "Bats are blind.", "The Pacific Ocean is the largest ocean."], a: 2 }
+            { q: "Chrome Dino: You reach 99,999. What happens?", o: ["Jetpack unlocks", "Game crashes", "Score resets to 0", "Screen inverts"], a: 2 },
+            { q: "Incognito Guy: What is he actually wearing?", o: ["Mask", "Fedora + Glasses", "Trench + Shades", "Flat cap"], a: 1 },
+            { q: "Phir Hera Pheri: Company name?", o: ["Star Fisheries", "Baburao & Sons", "Laxmi Chit Fund", "21-Day Scheme"], a: 2 },
+            { q: "Spotify Waves: Direction of lean?", o: ["Vertical", "Left", "Right", "Circular"], a: 2 },
+            { q: "Rickroll video: What is Rick wearing?", o: ["Silver suit", "Striped polo + Trench", "Denim combo", "Red leather"], a: 1 },
+            { q: "QR Code: How many corner squares?", o: ["4", "3", "2", "6"], a: 1 },
+            { q: "YouTube Desktop: Key to skip 10s?", o: ["Right Arrow", "L", "K", "J"], a: 1 },
+            { q: "Keyboard: Which two keys have bumps?", o: ["G & H", "W & S", "F & J", "A & L"], a: 2 },
+            { q: "Google 'Askew': Webpage effect?", o: ["Reverse", "Tilts Right", "Blurry", "Dog"], a: 1 },
+            { q: "Apple Watch ads: The time displayed?", o: ["10:09", "10:10", "9:41", "12:00"], a: 1 },
+            { q: "VLC Player: Christmas event?", o: ["Red/Green stripes", "Santa hat on cone", "Snowman", "Jingle"], a: 1 },
+            { q: "3 Idiots Space Pen: The mechanism?", o: ["Micro-pump", "Pressurized Nitrogen", "Magnetic", "Vacuum"], a: 1 }
         ];
 
         let currentQuestionIndex = 0;
@@ -197,7 +177,7 @@
 
                 if (timeRemaining <= 0) {
                     clearInterval(timerInterval);
-                    submitAnswer(-1); // Timeout
+                    submitAnswer(-1);
                 }
             }, 100);
         }
@@ -231,4 +211,4 @@
         }
     </script>
 </body>
-</html>         
+</html>
