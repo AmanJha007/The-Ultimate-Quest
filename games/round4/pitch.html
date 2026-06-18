@@ -3,95 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Round 4: Shark Tank</title>
     <style>
-        body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: #010409;
-            color: #c9d1d9;
-            display: flex;
-            justify-content: center;
-            padding: 3rem 1rem;
-            margin: 0;
-        }
-        .board {
-            background: linear-gradient(145deg, #161b22, #0d1117);
-            border: 2px solid #3fb950;
-            border-radius: 12px;
-            padding: 3rem;
-            max-width: 800px;
-            box-shadow: 0 0 20px rgba(63, 185, 80, 0.2);
-        }
-        h1 {
-            color: #3fb950;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-bottom: 1px solid #30363d;
-            padding-bottom: 1rem;
-        }
-        .section-title {
-            color: #58a6ff;
-            font-size: 1.4rem;
-            margin-top: 2rem;
-            font-weight: bold;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-        .card {
-            background-color: #21262d;
-            padding: 1rem;
-            border-left: 4px solid #d2a8ff;
-            border-radius: 4px;
-        }
-        .rules {
-            margin-top: 2rem;
-            background-color: rgba(255, 123, 114, 0.1);
-            border: 1px solid #ff7b72;
-            padding: 1.5rem;
-            border-radius: 8px;
-        }
-        .rules li {
-            margin-bottom: 0.5rem;
-            color: #ff7b72;
-        }
+        body { background: #050505; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh;}
+        .container { width: 100%; max-width: 800px; border: 1px solid #008f11; padding: 40px; background: #0a0a0a; text-align: center; box-shadow: 0 0 20px rgba(0, 143, 17, 0.2); }
+        h2 { color: #14B8A6; text-transform: uppercase; margin-top: 0; font-size: 2.5rem; letter-spacing: 2px; border-bottom: 2px dashed #008f11; padding-bottom: 20px;}
+        .brief-box { text-align: left; margin: 30px 0; background: rgba(20, 184, 166, 0.05); border-left: 4px solid #14B8A6; padding: 20px; }
+        .brief-box h3 { color: #fff; margin-top: 0; font-size: 1.5rem; }
+        .rules-list { color: #fff; line-height: 1.8; font-size: 1.2rem; list-style-type: square; padding-left: 20px; }
+        .highlight { color: #ff003c; font-weight: bold; }
+        .status-indicator { margin-top: 30px; font-size: 1.5rem; font-weight: bold; color: #ff003c; border: 2px solid #ff003c; padding: 15px; text-transform: uppercase; letter-spacing: 2px; }
+        .status-indicator.live { color: #0f0; border-color: #0f0; box-shadow: 0 0 15px #0f0; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 5px #0f0; } 50% { box-shadow: 0 0 20px #0f0; } 100% { box-shadow: 0 0 5px #0f0; } }
     </style>
 </head>
 <body>
 
-    <div class="board">
-        <h1>ROUND 4: THE CHAOS PITCH</h1>
-        <p style="text-align: center; color: #8b949e;">Admin will assign your Triad one of the following concepts. You have 3 minutes to prepare a pitch to secure funding from our highly unreasonable investors.</p>
-
-        <div class="section-title">Category A: Abstract Apps</div>
-        <div class="grid">
-            <div class="card">Tinder, but strictly for matching with group project members who actually work.</div>
-            <div class="card">A smart alarm clock that un-sends your last risky text if you don't wake up.</div>
-            <div class="card">An AI that writes customized, highly emotional apology emails to professors.</div>
-            <div class="card">Uber, but for getting a friend to bail you out of an awkward conversation.</div>
-        </div>
-
-        <div class="section-title">Category B: Physical Garbage</div>
-        <div class="grid">
-            <div class="card">A half-empty packet of sattu powder.</div>
-            <div class="card">An empty glass jar explicitly labeled "Premium AC Air".</div>
-            <div class="card">A laptop charger that only works if bent at exactly a 47-degree angle.</div>
-            <div class="card">A single, perfectly intact potato chip.</div>
-        </div>
-
-        <div class="rules">
-            <strong>JUDGING CRITERIA:</strong>
-            <ul>
-                <li>Confidence in absolute nonsense.</li>
-                <li>Ability to answer hostile questions from the investors.</li>
-                <li>Monetization strategy (How are you scamming people?).</li>
+    <div class="container">
+        <h2>ROUND 4: FUNNY SHARK TANK</h2>
+        
+        <div class="brief-box">
+            <h3>EXECUTIVE DIRECTIVE</h3>
+            <ul class="rules-list">
+                <li><span class="highlight">QUALIFICATION:</span> Only the Top 4 Triad Units on the Global Leaderboard advance to this final stage.</li>
+                <li><span class="highlight">THE OBJECTIVE:</span> Invent and pitch a hilariously absurd product to the panel of Judges.</li>
+                <li><span class="highlight">PREPARATION:</span> You have exactly 3 minutes to finalize your product name, concept, and pitch strategy.</li>
+                <li><span class="highlight">EXECUTION:</span> Pitches will be delivered live on the main transmission channel. Screen sharing for visual assets is authorized and encouraged.</li>
+                <li><span class="highlight">VICTORY CONDITION:</span> The pitch generating the maximum comedic yield wins the event.</li>
             </ul>
         </div>
+
+        <div class="status-indicator" id="round-status">AWAITING ADMIN INITIALIZATION...</div>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
+            authDomain: "phantom-protocol-8b3f3.firebaseapp.com",
+            projectId: "phantom-protocol-8b3f3",
+            storageBucket: "phantom-protocol-8b3f3.firebasestorage.app",
+            messagingSenderId: "331865995163",
+            appId: "1:331865995163:web:b0d2710410548f147e533e"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+        const statusEl = document.getElementById('round-status');
+
+        onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
+            if (docSnap.exists() && docSnap.data().gameActive && docSnap.data().currentRound === 4) {
+                statusEl.innerText = "ROUND 4 IS LIVE. PREPARE YOUR PITCH.";
+                statusEl.classList.add('live');
+            } else {
+                statusEl.innerText = "AWAITING ADMIN INITIALIZATION...";
+                statusEl.classList.remove('live');
+            }
+        });
+    </script>
 </body>
 </html>

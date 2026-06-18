@@ -4,172 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { background:#050505; color:#0f0; font-family:'Courier New',Courier,monospace; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; }
-        .container { width:100%; max-width:800px; border:1px solid #008f11; padding:30px; background:#0a0a0a; text-align:center; }
-        h2 { color:#14B8A6; text-transform:uppercase; margin-top:0; }
-        .hud { display:flex; justify-content:space-between; font-size:1.5rem; margin-bottom:20px; border-bottom:1px dashed #008f11; padding-bottom:10px; }
-        .screen { display:none; }
-        .active { display:block; }
-
-        /* Image counter */
-        .img-counter {
-            display: inline-block;
-            background: rgba(20,184,166,0.15);
-            border: 1px solid #14B8A6;
-            padding: 4px 14px;
-            border-radius: 3px;
-            font-size: 0.9rem;
-            color: #14B8A6;
-            font-weight: bold;
-            letter-spacing: 0.15em;
-            margin-bottom: 15px;
-        }
-
-        /* Image display */
-        .image-display {
-            max-width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            margin-bottom: 20px;
-            border: 1px solid #14B8A6;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Caption input */
-        input[type="text"] {
-            width: 90%;
-            padding: 15px;
-            background: #000;
-            border: 1px solid #0f0;
-            color: #0f0;
-            font-family: inherit;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        /* Buttons */
-        button {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: 0.3s;
-            font-family: inherit;
-        }
-        button:hover { background:#0f0; color:#000; }
-        button:disabled { border-color:#ff003c; color:#ff003c; cursor:not-allowed; opacity:0.5; }
-
-        /* Timer styling with colour */
-        .timer-text { font-weight:bold; font-size:2rem; }
-        .timer-text.safe   { color:#0f0; }
-        .timer-text.warn   { color:#ffd700; }
-        .timer-text.danger { color:#ff003c; }
-
-        /* Voting grid */
-        .voting-grid { display:grid; grid-template-columns:1fr; gap:10px; text-align:left; margin-top:20px; }
-        .vote-btn {
-            border:1px solid #14B8A6;
-            background:transparent;
-            color:#fff;
-            padding:15px;
-            cursor:pointer;
-            text-align:left;
-            font-size:1.1rem;
-            font-family:inherit;
-            transition: 0.2s;
-        }
-        .vote-btn:hover { background:#14B8A6; color:#000; }
-
-        /* Phase badge */
-        .phase-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            letter-spacing: 0.15em;
-            font-weight: bold;
-        }
-        .phase-input { background:rgba(0,255,65,0.15); color:#0f0; border:1px solid #0f0; }
-        .phase-vote  { background:rgba(255,0,60,0.15); color:#ff003c; border:1px solid #ff003c; }
-
-        /* Timer progress bar */
-        .timer-bar-bg {
-            width: 100%;
-            height: 6px;
-            background: #1a1a1a;
-            margin-bottom: 20px;
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .timer-bar {
-            height: 100%;
-            background: #0f0;
-            transition: width 0.1s linear, background 0.5s;
-            border-radius: 3px;
-        }
-
-        /* Completion screen */
-        .done-box { text-align:center; padding:40px 20px; }
-        .done-box h2 { color:#14B8A6; font-size:2rem; border:none; }
-        .done-box p  { color:#fff; font-size:1.1rem; margin-top:15px; line-height:1.7; }
-        .done-icon   { font-size:3.5rem; margin-bottom:10px; }
+        body { background: #050505; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 800px; border: 1px solid #008f11; padding: 30px; background: #0a0a0a; text-align: center; }
+        h2 { color: #14B8A6; text-transform: uppercase; margin-top: 0; }
+        .image-display { max-width: 100%; max-height: 400px; object-fit: contain; margin-bottom: 20px; border: 1px solid #14B8A6; display: block; margin-left: auto; margin-right: auto; }
+        input[type="text"] { width: 90%; padding: 15px; background: #000; border: 1px solid #0f0; color: #0f0; font-family: inherit; font-size: 1.2rem; margin-bottom: 20px; text-align: center; }
+        button { background: #000; color: #0f0; border: 1px solid #0f0; padding: 15px 30px; font-size: 1.2rem; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: #0f0; color: #000; }
+        button:disabled { border-color: #ff003c; color: #ff003c; cursor: not-allowed; opacity: 0.5; }
+        .hud { display: flex; justify-content: space-between; font-size: 1.5rem; margin-bottom: 20px; border-bottom: 1px dashed #008f11; padding-bottom: 10px; }
+        #timer-input, #timer-vote { color: #ff003c; font-weight: bold; font-size: 2rem; }
+        .voting-grid { display: grid; grid-template-columns: 1fr; gap: 10px; text-align: left; margin-top: 20px; }
+        .vote-btn { border: 1px solid #14B8A6; background: transparent; color: #fff; padding: 15px; cursor: pointer; text-align: left; font-size: 1.1rem; }
+        .vote-btn:hover { background: #14B8A6; color: #000; }
+        .screen { display: none; }
+        .active { display: block; }
     </style>
 </head>
 <body>
 
-    <!-- INSTRUCTION SCREEN -->
     <div class="container screen active" id="instruction-screen">
         <h2>ROUND 3: WITTY CAPTIONS</h2>
-        <div style="text-align:left; color:#fff; line-height:1.6; margin-bottom:20px;">
+        <div style="text-align: left; color: #fff; line-height: 1.6; margin-bottom: 20px;">
             <p><strong>PHASE 1 (40s):</strong> Collaborate with your Triad Unit. Only ONE submission per team is permitted. Once transmitted, all teammates' screens will lock.</p>
             <p><strong>PHASE 2 (30s):</strong> Review all submissions. You cannot vote for your own Triad Unit.</p>
-            <p style="color:#ff003c;"><strong>TIE-BREAKER PROTOCOL:</strong> In the event of a voting tie, the team with the fastest submission timestamp takes priority.</p>
-            <p style="color:#14B8A6;"><strong>REWARDS:</strong> 1st = 10 PTS | 2nd = 7 PTS | 3rd = 5 PTS</p>
+            <p style="color: #ff003c;"><strong>TIE-BREAKER PROTOCOL:</strong> In the event of a voting tie, the team with the fastest submission timestamp takes priority.</p>
+            <p style="color: #14B8A6;"><strong>REWARDS:</strong> 1st = 10 PTS | 2nd = 7 PTS | 3rd = 5 PTS</p>
         </div>
-        <p style="color:#008f11; font-size:0.9rem;">⏳ WAITING FOR ADMIN TO START...</p>
     </div>
 
-    <!-- SUBMISSION PHASE SCREEN -->
     <div class="container screen" id="input-screen">
         <div class="hud">
-            <div><span class="phase-badge phase-input">SUBMISSION PHASE</span></div>
-            <div><span id="timer-input" class="timer-text safe">40.0</span>s</div>
+            <div>SUBMISSION PHASE</div>
+            <div><span id="timer-input">40.0</span>s</div>
         </div>
-        <div class="timer-bar-bg"><div class="timer-bar" id="bar-input" style="width:100%;"></div></div>
-        <div class="img-counter" id="img-counter-input">IMAGE 01 / 14</div>
         <img id="current-image-input" class="image-display" src="">
-        <input type="text" id="caption-input" placeholder="ENTER YOUR WITTIEST CAPTION..." maxlength="150" autocomplete="off">
-        <button id="btn-submit-caption">📡 TRANSMIT CAPTION</button>
+        <input type="text" id="caption-input" placeholder="ENTER CAPTION HERE..." autocomplete="off">
+        <button id="btn-submit-caption">TRANSMIT</button>
     </div>
 
-    <!-- VOTING PHASE SCREEN -->
     <div class="container screen" id="voting-screen">
         <div class="hud">
-            <div><span class="phase-badge phase-vote">VOTING PHASE</span></div>
-            <div><span id="timer-vote" class="timer-text danger">30.0</span>s</div>
+            <div>VOTING PHASE</div>
+            <div><span id="timer-vote">30.0</span>s</div>
         </div>
-        <div class="timer-bar-bg"><div class="timer-bar" id="bar-vote" style="width:100%; background:#ff003c;"></div></div>
-        <div class="img-counter" id="img-counter-vote">IMAGE 01 / 14</div>
         <img id="current-image-vote" class="image-display" src="">
         <div class="voting-grid" id="voting-list"></div>
     </div>
 
-    <!-- WAIT SCREEN -->
     <div class="container screen" id="wait-screen">
-        <h2>TRANSMISSION LOGGED ✅</h2>
-        <p style="color:#fff; margin-top:20px;">Awaiting network synchronization for the next phase...</p>
+        <h2>TRANSMISSION LOGGED</h2>
+        <p style="color: #fff; margin-top: 20px;">Awaiting network synchronization for the next phase...</p>
     </div>
 
     <script type="module">
-        import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { initializeFirestore, doc, onSnapshot, collection, query, setDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { submitR3Caption }    from "../../js/db.js";
+        import { submitR3Caption } from "../../js/db.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDkUA9Ws1q7yByKn-qICSBrSVIQgUckFOw",
@@ -179,107 +70,75 @@
             messagingSenderId: "331865995163",
             appId: "1:331865995163:web:b0d2710410548f147e533e"
         };
-
+        
         const app = initializeApp(firebaseConfig);
-        const db  = initializeFirestore(app, { experimentalForceLongPolling: true });
-
-        const TOTAL_IMAGES = 14;
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
         const sessionData = localStorage.getItem('phantom_session');
         const user = sessionData ? JSON.parse(sessionData) : { triad: 'UNKNOWN' };
 
         const screens = {
-            inst:  document.getElementById('instruction-screen'),
+            inst: document.getElementById('instruction-screen'),
             input: document.getElementById('input-screen'),
-            vote:  document.getElementById('voting-screen'),
-            wait:  document.getElementById('wait-screen')
+            vote: document.getElementById('voting-screen'),
+            wait: document.getElementById('wait-screen')
         };
 
-        function switchScreen(key) {
+        function switchScreen(screenKey) {
             Object.values(screens).forEach(s => s.classList.remove('active'));
-            screens[key].classList.add('active');
+            screens[screenKey].classList.add('active');
         }
 
-        // ── Timer with progress bar + colour ──
         let r3Timer;
-        function startVisualTimer(timerId, barId, duration) {
+        function startVisualTimer(elementId, duration) {
             let time = duration;
-            const timerEl = document.getElementById(timerId);
-            const barEl   = document.getElementById(barId);
-            timerEl.innerText = time.toFixed(1);
-            barEl.style.width = '100%';
-
+            document.getElementById(elementId).innerText = time.toFixed(1);
             clearInterval(r3Timer);
             r3Timer = setInterval(() => {
                 time -= 0.1;
-                if (time <= 0) { time = 0; clearInterval(r3Timer); }
-                timerEl.innerText = time.toFixed(1);
-                barEl.style.width = ((time / duration) * 100) + '%';
-
-                // Colour code timer
-                timerEl.classList.remove('safe', 'warn', 'danger');
-                if      (time > duration * 0.5)  timerEl.classList.add('safe');
-                else if (time > duration * 0.25) timerEl.classList.add('warn');
-                else                              timerEl.classList.add('danger');
-
-                // Colour code bar
-                if      (time > duration * 0.5)  barEl.style.background = '#0f0';
-                else if (time > duration * 0.25) barEl.style.background = '#ffd700';
-                else                              barEl.style.background = '#ff003c';
+                if(time <= 0) {
+                    time = 0;
+                    clearInterval(r3Timer);
+                }
+                document.getElementById(elementId).innerText = time.toFixed(1);
             }, 100);
         }
 
-        // ── Update image counter display ──
-        function updateImageCounter(idx) {
-            const label = `IMAGE ${String(idx).padStart(2, '0')} / ${TOTAL_IMAGES}`;
-            const el1 = document.getElementById('img-counter-input');
-            const el2 = document.getElementById('img-counter-vote');
-            if (el1) el1.textContent = label;
-            if (el2) el2.textContent = label;
-        }
-
-        // ── Submit caption ──
         const btnSubmit = document.getElementById('btn-submit-caption');
-        const inputCap  = document.getElementById('caption-input');
+        const inputCap = document.getElementById('caption-input');
 
         btnSubmit.addEventListener('click', async () => {
             const capText = inputCap.value.trim();
-            if (!capText) return;
+            if(!capText) return;
             btnSubmit.disabled = true;
-            inputCap.disabled  = true;
+            inputCap.disabled = true;
+            
             await submitR3Caption(capText);
             switchScreen('wait');
         });
 
-        // ── Listen to admin game state (controls phase transitions) ──
         onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
-            if (!docSnap.exists()) return;
-            const data = docSnap.data();
-
-            // Update image source + counter
-            if (data.r3ImageIndex) {
-                const idx = data.r3ImageIndex;
-                document.getElementById('current-image-input').src = `assets/${idx}.jpg`;
-                document.getElementById('current-image-vote').src  = `assets/${idx}.jpg`;
-                updateImageCounter(idx);
-            }
-
-            // Switch phases
-            if (data.r3Phase === 'input') {
-                switchScreen('input');
-                startVisualTimer('timer-input', 'bar-input', 40.0);
-                inputCap.value    = '';
-                inputCap.disabled = false;
-                btnSubmit.disabled = false;
-            } else if (data.r3Phase === 'vote') {
-                switchScreen('vote');
-                startVisualTimer('timer-vote', 'bar-vote', 30.0);
-            } else if (data.r3Phase === 'wait') {
-                switchScreen('wait');
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if(data.r3ImageIndex) {
+                    document.getElementById('current-image-input').src = `assets/${data.r3ImageIndex}.jpg`;
+                    document.getElementById('current-image-vote').src = `assets/${data.r3ImageIndex}.jpg`;
+                }
+                if(data.r3Phase === 'input') {
+                    switchScreen('input');
+                    startVisualTimer('timer-input', 40.0);
+                    inputCap.value = '';
+                    inputCap.disabled = false;
+                    btnSubmit.disabled = false;
+                } else if(data.r3Phase === 'vote') {
+                    switchScreen('vote');
+                    startVisualTimer('timer-vote', 30.0);
+                } else if(data.r3Phase === 'wait') {
+                    switchScreen('wait');
+                }
             }
         });
 
-        // ── Listen to all submitted captions (for voting) ──
         onSnapshot(query(collection(db, "r3_captions")), (snapshot) => {
             const list = document.getElementById('voting-list');
             list.innerHTML = '';
@@ -287,12 +146,12 @@
 
             snapshot.forEach((docSnap) => {
                 const d = docSnap.data();
-                if (d.triad === user.triad) {
+                if(d.triad === user.triad) {
                     teamHasSubmitted = true;
                 } else {
                     const btn = document.createElement('button');
                     btn.className = 'vote-btn';
-                    btn.innerHTML = `<span style="color:#14B8A6; font-size:0.8rem;">${d.triad}</span> — ${d.caption}`;
+                    btn.innerText = d.caption;
                     btn.onclick = async () => {
                         const buttons = document.querySelectorAll('.vote-btn');
                         buttons.forEach(b => b.disabled = true);
@@ -304,7 +163,6 @@
                 }
             });
 
-            // If team already submitted, lock the input screen
             if (teamHasSubmitted && document.getElementById('input-screen').classList.contains('active')) {
                 switchScreen('wait');
             }

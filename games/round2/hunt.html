@@ -14,6 +14,7 @@
             flex-direction: column;
             align-items: center;
         }
+        
         .container {
             width: 100%;
             max-width: 800px;
@@ -22,6 +23,7 @@
             background: #0a0a0a;
             text-align: left;
         }
+
         h2 {
             color: #14B8A6;
             text-transform: uppercase;
@@ -30,17 +32,23 @@
             border-bottom: 1px dashed #008f11;
             padding-bottom: 15px;
         }
+        
         .rules-box {
             border-left: 4px solid #ff003c;
+            padding-left: 15px;
             margin-bottom: 25px;
             color: #fff;
             line-height: 1.6;
             background: rgba(255, 0, 60, 0.05);
             padding: 15px;
         }
-        .highlight { color: #ff003c; font-weight: bold; font-size: 1.1rem; }
 
-        /* Task card with flash on change */
+        .highlight {
+            color: #ff003c;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
         .task-card {
             background: #050505;
             border: 1px solid #14B8A6;
@@ -51,117 +59,88 @@
             min-height: 150px;
             text-align: center;
             box-shadow: 0 0 15px rgba(20, 184, 166, 0.1);
-            transition: background 0.3s, box-shadow 0.3s;
         }
-        .task-card.flash {
-            background: rgba(20, 184, 166, 0.15);
-            box-shadow: 0 0 30px rgba(20, 184, 166, 0.5);
-        }
-        .task-desc { color: #fff; font-size: 1.8rem; line-height: 1.4; font-weight: bold; }
 
-        .hud {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            border-bottom: 1px dashed #008f11;
-            padding-bottom: 10px;
+        .task-desc {
+            color: #fff;
+            font-size: 1.8rem;
+            line-height: 1.4;
+            font-weight: bold;
         }
+
+        .hud { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 1.5rem; 
+            margin-bottom: 20px; 
+            border-bottom: 1px dashed #008f11; 
+            padding-bottom: 10px; 
+        }
+
         #task-num-display { color: #14B8A6; font-weight: bold; }
-        #hunt-timer       { font-weight: bold; font-size: 2rem; }
-        #hunt-timer.safe   { color: #0f0; }
-        #hunt-timer.warn   { color: #ffd700; }
-        #hunt-timer.danger { color: #ff003c; }
+        #hunt-timer { color: #ff003c; font-weight: bold; font-size: 2rem; }
 
         #hunt-screen { display: none; }
 
-        /* Progress dots */
-        #progress-bar {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .prog-dot {
-            width: 24px;
-            height: 24px;
-            border: 1px solid #008f11;
-            border-radius: 3px;
-            background: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.62rem;
-            color: #008f11;
-            transition: all 0.4s;
-        }
-        .prog-dot.done   { background: #14B8A6; border-color: #14B8A6; color: #000; font-weight: bold; }
-        .prog-dot.active { border-color: #ff003c; color: #ff003c; box-shadow: 0 0 8px rgba(255,0,60,0.5); }
-
         #play-btn {
-            background: transparent; color: #ff003c;
+            background: transparent;
+            color: #ff003c;
             border: 2px solid #ff003c;
-            padding: 15px 30px; font-size: 1.2rem;
-            cursor: not-allowed; text-transform: uppercase;
-            font-weight: bold; width: 100%;
-            transition: 0.3s; margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            cursor: not-allowed;
+            text-transform: uppercase;
+            font-weight: bold;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 20px;
         }
-        #play-btn.ready              { border-color: #0f0; color: #0f0; cursor: pointer; }
-        #play-btn.ready:hover        { background: #0f0; color: #000; }
 
-        /* Completion screen */
-        .complete-box { text-align: center; padding: 40px 20px; }
-        .complete-box h2     { color: #14B8A6; font-size: 2rem; border: none; }
-        .complete-box p      { color: #fff; font-size: 1.1rem; margin-top: 15px; line-height: 1.7; }
-        .complete-box .icon  { font-size: 3.5rem; margin-bottom: 10px; }
+        #play-btn.ready {
+            border-color: #0f0;
+            color: #0f0;
+            cursor: pointer;
+        }
+
+        #play-btn.ready:hover {
+            background: #0f0;
+            color: #000;
+        }
     </style>
 </head>
 <body>
 
-    <!-- INSTRUCTION SCREEN -->
     <div class="container" id="instruction-screen">
         <h2>ROUND 2: SECURE ASSET RETRIEVAL</h2>
+        
         <div class="rules-box">
             <p><strong>MISSION BRIEF:</strong> You have exactly 60 seconds per target to locate the asset and transmit visual proof.</p>
             <p><strong>TRANSMISSION PROTOCOL:</strong> Every image MUST be captioned exactly like this in the WhatsApp channel:</p>
-            <p class="highlight" style="text-align:center; margin:15px 0;">TeamNumber-TaskNumber-Name</p>
-            <p style="text-align:center; color:#14B8A6;">(Example: T4-03-Aman)</p>
-            <p style="margin-top:15px;"><strong>WARNING:</strong> When the timer hits zero, the target changes. Late transmissions receive ZERO points.</p>
+            <p class="highlight" style="text-align: center; margin: 15px 0;">TeamNumber-TaskNumber-Name</p>
+            <p style="text-align: center; color: #14B8A6;">(Example: T4-03-Aman)</p>
+            <p style="margin-top: 15px;"><strong>WARNING:</strong> When the timer hits zero, the target changes. Late transmissions receive ZERO points.</p>
         </div>
+
         <button id="play-btn" disabled>AWAITING ADMIN SIGNAL...</button>
     </div>
 
-    <!-- HUNT SCREEN -->
     <div class="container" id="hunt-screen">
         <div class="hud">
             <div id="task-num-display">TASK 01 / 08</div>
-            <div><span id="hunt-timer" class="danger">60.0</span>s</div>
+            <div><span id="hunt-timer">60.0</span>s</div>
+        </div>
+        
+        <div class="rules-box" style="border-left-color: #14B8A6; background: rgba(20, 184, 166, 0.05); margin-bottom: 30px;">
+            <p style="text-align: center;"><strong>WHATSAPP FORMAT: <span class="highlight" style="color: #14B8A6;">TeamNumber-TaskNumber-Name</span></strong></p>
         </div>
 
-        <!-- Progress dots — one per task -->
-        <div id="progress-bar">
-            <div class="prog-dot active" id="dot-0">01</div>
-            <div class="prog-dot" id="dot-1">02</div>
-            <div class="prog-dot" id="dot-2">03</div>
-            <div class="prog-dot" id="dot-3">04</div>
-            <div class="prog-dot" id="dot-4">05</div>
-            <div class="prog-dot" id="dot-5">06</div>
-            <div class="prog-dot" id="dot-6">07</div>
-            <div class="prog-dot" id="dot-7">08</div>
-        </div>
-
-        <div class="rules-box" style="border-left-color:#14B8A6; background:rgba(20,184,166,0.05); margin-bottom:30px;">
-            <p style="text-align:center;"><strong>WHATSAPP FORMAT: <span class="highlight" style="color:#14B8A6;">TeamNumber-TaskNumber-Name</span></strong></p>
-        </div>
-
-        <div class="task-card" id="task-card">
+        <div class="task-card">
             <div id="current-task-text" class="task-desc">LOADING...</div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { initializeFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -172,25 +151,22 @@
             messagingSenderId: "331865995163",
             appId: "1:331865995163:web:b0d2710410548f147e533e"
         };
-
+        
         const app = initializeApp(firebaseConfig);
-        const db  = initializeFirestore(app, { experimentalForceLongPolling: true });
+        const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
-        const GAME_ID = 'r2_hunt'; // ← unique ID — used by main.js anti-cheat
-
-        const btnPlay          = document.getElementById('play-btn');
-        const screenInst       = document.getElementById('instruction-screen');
-        const screenHunt       = document.getElementById('hunt-screen');
-        const taskNumDisplay   = document.getElementById('task-num-display');
+        const btnPlay = document.getElementById('play-btn');
+        const screenInst = document.getElementById('instruction-screen');
+        const screenHunt = document.getElementById('hunt-screen');
+        const taskNumDisplay = document.getElementById('task-num-display');
         const huntTimerDisplay = document.getElementById('hunt-timer');
-        const currentTaskText  = document.getElementById('current-task-text');
-        const taskCard         = document.getElementById('task-card');
+        const currentTaskText = document.getElementById('current-task-text');
 
         const tasks = [
             "Bring the weirdest item in your bag.",
             "Bring something that costs less than ₹10.",
-            "Bring something that's definitely not yours.",
-            "Bring something that proves you're an engineering student.",
+            "Bring something that’s definitely not yours.",
+            "Bring something that proves you’re an engineering student.",
             "Bring the oldest receipt you can find.",
             "Bring something that is broken but still kept.",
             "Something with a barcode.",
@@ -198,10 +174,9 @@
         ];
 
         let currentTaskIndex = 0;
-        let timeRemaining    = 60.0;
+        let timeRemaining = 60.0;
         let huntTimer;
 
-        // ── Admin unlock listener ──
         onSnapshot(doc(db, "admin", "gameState"), (docSnap) => {
             if (docSnap.exists() && docSnap.data().gameActive) {
                 btnPlay.disabled = false;
@@ -221,65 +196,27 @@
             loadTask();
         });
 
-        // ── Update the 8 progress dots ──
-        function updateProgressDots(activeIdx) {
-            for (let i = 0; i < tasks.length; i++) {
-                const dot = document.getElementById(`dot-${i}`);
-                if (!dot) continue;
-                dot.classList.remove('done', 'active');
-                if      (i < activeIdx)  dot.classList.add('done');
-                else if (i === activeIdx) dot.classList.add('active');
-            }
-        }
-
-        // ── Flash the task card when a new task loads ──
-        function flashCard() {
-            taskCard.classList.add('flash');
-            setTimeout(() => taskCard.classList.remove('flash'), 500);
-        }
-
-        // ── Colour-code the timer (green → yellow → red) ──
-        function updateTimerColor(t) {
-            huntTimerDisplay.classList.remove('safe', 'warn', 'danger');
-            if      (t > 30) huntTimerDisplay.classList.add('safe');
-            else if (t > 15) huntTimerDisplay.classList.add('warn');
-            else             huntTimerDisplay.classList.add('danger');
-        }
-
-        // ── Load next task or show completion ──
         function loadTask() {
             if (currentTaskIndex >= tasks.length) {
-                // Hunt is over — show completion screen
-                screenHunt.innerHTML = `
-                    <div class="complete-box">
-                        <div class="icon">✅</div>
-                        <h2>HUNT COMPLETE</h2>
-                        <p>All 8 targets exhausted.<br>Awaiting final assessment from the Command Center.</p>
-                    </div>`;
-
-                // ← Tell parent to lock the "SCAVENGER HUNT" button (anti-cheat)
-                window.parent.postMessage({ type: 'ROUND_COMPLETE', gameId: GAME_ID }, '*');
+                screenHunt.innerHTML = "<h2>HUNT COMPLETE</h2><p style='color:#fff; text-align:center; margin-top: 20px; font-size: 1.2rem;'>All targets exhausted. Awaiting final assessment from the Command Center.</p>";
                 return;
             }
 
             timeRemaining = 60.0;
-            taskNumDisplay.innerText = `TASK ${String(currentTaskIndex + 1).padStart(2, '0')} / 08`;
+            taskNumDisplay.innerText = `TASK ${(currentTaskIndex + 1).toString().padStart(2, '0')} / 08`;
             currentTaskText.innerText = tasks[currentTaskIndex];
             huntTimerDisplay.innerText = timeRemaining.toFixed(1);
-            updateProgressDots(currentTaskIndex);
-            flashCard();
 
             clearInterval(huntTimer);
             huntTimer = setInterval(() => {
                 timeRemaining -= 0.1;
-                updateTimerColor(timeRemaining);
-                huntTimerDisplay.innerText = Math.max(0, timeRemaining).toFixed(1);
-
                 if (timeRemaining <= 0) {
+                    timeRemaining = 0;
                     clearInterval(huntTimer);
                     currentTaskIndex++;
                     loadTask();
                 }
+                huntTimerDisplay.innerText = Math.max(0, timeRemaining).toFixed(1);
             }, 100);
         }
     </script>

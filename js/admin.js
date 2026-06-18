@@ -1,4 +1,4 @@
-import { setGlobalRound, unlockCurrentGame, lockGame, addTeamBonus, clearAndStartR3, setR3State, awardR3Winners, getAllPlayers } from './db.js';
+import { setGlobalRound, unlockCurrentGame, addTeamBonus, clearAndStartR3, setR3State, awardR3Winners } from './db.js';
 
 // ═══════════════════════════════════════
 // PANEL 1: Round Control
@@ -20,176 +20,82 @@ btnSetRound.addEventListener('click', async () => {
     try {
         const round = parseInt(selectRound.value);
         await setGlobalRound(round);
-        showStatus(statusText, `✅ ROUND ${round} DEPLOYED (LOCKED)`, '#0f0', 4000);
-    } catch (e) {
-        console.error(e);
-        showStatus(statusText, `❌ DEPLOY FAILED`, '#ff003c', 4000);
+        statusText.innerText = `[SYSTEM]: ROUND ${round} DEPLOYED (LOCKED)`;
+        statusText.style.color = "#0f0";
+        setTimeout(() => { statusText.innerText = ''; }, 3000);
+    } catch (error) {
+        console.error(error);
+        statusText.innerText = `[ERROR]: DEPLOY FAILED`;
+        statusText.style.color = "#ff003c";
     }
 });
 
 btnUnlockGame.addEventListener('click', async () => {
     try {
         await unlockCurrentGame();
-        showStatus(statusText, `✅ GAME UNLOCKED FOR PLAYERS`, '#14B8A6', 4000);
-    } catch (e) {
-        console.error(e);
-        showStatus(statusText, `❌ UNLOCK FAILED`, '#ff003c', 4000);
+        statusText.innerText = `[SYSTEM]: GAME UNLOCKED FOR PLAYERS`;
+        statusText.style.color = "#14B8A6";
+        setTimeout(() => { statusText.innerText = ''; }, 3000);
+    } catch (error) {
+        console.error(error);
+        statusText.innerText = `[ERROR]: UNLOCK FAILED`;
+        statusText.style.color = "#ff003c";
     }
 });
 
-// ── Quick Deploy + Unlock (one click) ──
-btnQuickDeploy.addEventListener('click', async () => {
-    try {
-        const round = parseInt(selectRound.value);
-        showStatus(statusText, `⚡ DEPLOYING ROUND ${round}...`, '#ffd700');
-        await setGlobalRound(round);
-        // Small delay so clients pick up the round change before unlock
-        await new Promise(r => setTimeout(r, 500));
-        await unlockCurrentGame();
-        showStatus(statusText, `✅ ROUND ${round} LIVE — PLAYERS CAN PLAY`, '#0f0', 5000);
-    } catch (e) {
-        console.error(e);
-        showStatus(statusText, `❌ QUICK DEPLOY FAILED`, '#ff003c', 4000);
-    }
-});
-
-// ── Emergency Lock ──
-btnLockGame.addEventListener('click', async () => {
-    try {
-        await lockGame();
-        showStatus(statusText, `🔒 GAME LOCKED — ALL PLAYERS FROZEN`, '#ff003c', 5000);
-    } catch (e) {
-        console.error(e);
-        showStatus(statusText, `❌ LOCK FAILED`, '#ff003c', 4000);
-    }
-});
-
-// ═══════════════════════════════════════
-// PANEL 2: Manual Score Injection
-// ═══════════════════════════════════════
-const btnInjectScore    = document.getElementById('btn-inject-score');
+const btnInjectScore = document.getElementById('btn-inject-score');
 const selectManualTriad = document.getElementById('manual-triad-select');
 const inputManualPoints = document.getElementById('manual-points');
-const overrideStatus    = document.getElementById('override-status');
+const overrideStatus = document.getElementById('override-status');
 
 btnInjectScore.addEventListener('click', async () => {
-    const triad  = selectManualTriad.value;
+    const triad = selectManualTriad.value;
     const points = parseInt(inputManualPoints.value);
 
     if (!triad || isNaN(points)) {
-        showStatus(overrideStatus, `⚠ SELECT UNIT AND ENTER VALID POINTS`, '#ff003c', 3000);
+        overrideStatus.innerText = `[ERROR]: SELECT UNIT AND ENTER VALID POINTS.`;
+        overrideStatus.style.color = "#ff003c";
+        setTimeout(() => { overrideStatus.innerText = ''; }, 3000);
         return;
     }
 
     try {
         await addTeamBonus(triad, points);
-        showStatus(overrideStatus, `✅ ${points} PTS INJECTED → ${triad}`, '#0f0', 4000);
+        overrideStatus.innerText = `[SYSTEM]: ${points} PTS INJECTED TO ${triad}`;
+        overrideStatus.style.color = "#0f0";
         inputManualPoints.value = '';
-    } catch (e) {
-        console.error(e);
-        showStatus(overrideStatus, `❌ INJECTION FAILED`, '#ff003c', 4000);
+        setTimeout(() => { overrideStatus.innerText = ''; }, 3000);
+    } catch (error) {
+        console.error(error);
+        overrideStatus.innerText = `[ERROR]: INJECTION FAILED`;
+        overrideStatus.style.color = "#ff003c";
     }
 });
 
-// ═══════════════════════════════════════
-// PANEL 3: Round 3 Controls
-// ═══════════════════════════════════════
-const btnR3Input    = document.getElementById('btn-r3-input');
-const btnR3Vote     = document.getElementById('btn-r3-vote');
-const btnR3Award    = document.getElementById('btn-r3-award');
-const r3ImageIndex  = document.getElementById('r3-image-index');
-const r3Status      = document.getElementById('r3-status');
-
-let r3SubmissionTimer = null;
-let r3VotingTimer     = null;
+const btnR3Input = document.getElementById('btn-r3-input');
+const btnR3Vote = document.getElementById('btn-r3-vote');
+const btnR3Award = document.getElementById('btn-r3-award');
+const r3ImageIndex = document.getElementById('r3-image-index');
+const r3Status = document.getElementById('r3-status');
 
 btnR3Input.addEventListener('click', async () => {
     const idx = parseInt(r3ImageIndex.value);
-    if (isNaN(idx) || idx < 1 || idx > 14) {
-        showStatus(r3Status, `⚠ ENTER IMAGE NUMBER 1–14`, '#ff003c', 3000);
-        return;
-    }
-    try {
-        await clearAndStartR3(idx);
-        showStatus(r3Status, `✅ IMAGE ${idx} — SUBMISSIONS OPEN (40s)`, '#14B8A6');
-
-        // Auto-close submissions after 40s
-        clearTimeout(r3SubmissionTimer);
-        r3SubmissionTimer = setTimeout(async () => {
-            await setR3State('wait');
-            showStatus(r3Status, `🔒 SUBMISSIONS CLOSED — READY FOR VOTING`, '#ffd700');
-        }, 40000);
-    } catch (e) {
-        console.error(e);
-        showStatus(r3Status, `❌ FAILED TO START`, '#ff003c', 4000);
-    }
+    if(isNaN(idx)) return;
+    await clearAndStartR3(idx);
+    r3Status.innerText = `[SYSTEM]: ASSET ${idx} SUBMISSIONS OPEN`;
+    r3Status.style.color = "#14B8A6";
+    setTimeout(() => { setR3State('wait'); r3Status.innerText = `[SYSTEM]: SUBMISSIONS CLOSED`; }, 40000);
 });
 
 btnR3Vote.addEventListener('click', async () => {
-    try {
-        await setR3State('vote');
-        showStatus(r3Status, `✅ VOTING OPEN (30s)`, '#ff003c');
-
-        // Auto-close voting after 30s
-        clearTimeout(r3VotingTimer);
-        r3VotingTimer = setTimeout(async () => {
-            await setR3State('wait');
-            showStatus(r3Status, `🔒 VOTING CLOSED — READY TO AWARD`, '#ffd700');
-        }, 30000);
-    } catch (e) {
-        console.error(e);
-        showStatus(r3Status, `❌ FAILED TO START VOTING`, '#ff003c', 4000);
-    }
+    await setR3State('vote');
+    r3Status.innerText = `[SYSTEM]: VOTING OPEN`;
+    r3Status.style.color = "#ff003c";
+    setTimeout(() => { setR3State('wait'); r3Status.innerText = `[SYSTEM]: VOTING CLOSED`; }, 30000);
 });
 
 btnR3Award.addEventListener('click', async () => {
-    try {
-        await awardR3Winners();
-        showStatus(r3Status, `✅ POINTS AWARDED TO TOP 3`, '#0f0', 5000);
-    } catch (e) {
-        console.error(e);
-        showStatus(r3Status, `❌ AWARD FAILED`, '#ff003c', 4000);
-    }
-});
-
-// ═══════════════════════════════════════
-// PANEL 4: Player Monitor
-// ═══════════════════════════════════════
-const btnViewPlayers  = document.getElementById('btn-view-players');
-const playerListDiv   = document.getElementById('player-list');
-const playerContainer = document.getElementById('player-list-container');
-const playerCountDiv  = document.getElementById('player-count');
-const monitorStatus   = document.getElementById('monitor-status');
-
-btnViewPlayers.addEventListener('click', async () => {
-    try {
-        showStatus(monitorStatus, '⏳ LOADING...', '#ffd700');
-        const players = await getAllPlayers();
-
-        // Count real players (not manual bonus entries)
-        const realPlayers = players.filter(p => p.alias !== 'JUDGE_OVERRIDE');
-
-        playerCountDiv.textContent = `REGISTERED: ${realPlayers.length} OPERATORS`;
-        playerListDiv.innerHTML = '';
-
-        if (realPlayers.length === 0) {
-            playerListDiv.innerHTML = '<div style="color:#008f11; padding:10px;">No players registered yet.</div>';
-        } else {
-            realPlayers.forEach(p => {
-                const row = document.createElement('div');
-                row.className = 'player-row';
-                row.innerHTML =
-                    `<span class="player-triad">${p.triad}</span>` +
-                    `<span class="player-alias">${p.alias}</span>` +
-                    `<span class="player-score">${p.totalScore} PTS</span>`;
-                playerListDiv.appendChild(row);
-            });
-        }
-
-        playerContainer.style.display = 'block';
-        showStatus(monitorStatus, '', '#0f0');
-    } catch (e) {
-        console.error(e);
-        showStatus(monitorStatus, `❌ FAILED TO LOAD PLAYERS`, '#ff003c', 4000);
-    }
+    await awardR3Winners();
+    r3Status.innerText = `[SYSTEM]: POINTS INJECTED TO TOP 3`;
+    r3Status.style.color = "#0f0";
 });

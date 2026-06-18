@@ -177,9 +177,6 @@ export function listenToGlobalState(callback) {
     });
 }
 
-// ════════════════════════════════════════════════════════════
-// EXISTING: Manual team bonus (for admin score injection)
-// ════════════════════════════════════════════════════════════
 export async function addTeamBonus(triad, points) {
     const teamRef = doc(db, "players", `${triad}_MANUAL_BONUS`);
     await setDoc(teamRef, {
@@ -192,15 +189,12 @@ export async function addTeamBonus(triad, points) {
     }, { merge: true });
 }
 
-// ════════════════════════════════════════════════════════════
-// EXISTING: Round 3 — Witty Captions
-// ════════════════════════════════════════════════════════════
 export async function submitR3Caption(caption) {
     const sessionData = localStorage.getItem('phantom_session');
     if (!sessionData) return;
     const user = JSON.parse(sessionData);
     const capRef = doc(db, "r3_captions", user.triad);
-
+    
     const docSnap = await getDoc(capRef);
     if (docSnap.exists()) return;
 
@@ -238,17 +232,17 @@ export async function awardR3Winners() {
     const snapshot = await getDocs(collection(db, "r3_captions"));
     const captions = [];
     snapshot.forEach((d) => captions.push(d.data()));
-
+    
     captions.sort((a, b) => {
         if (b.votes === a.votes) {
             return (a.timestamp || 0) - (b.timestamp || 0);
         }
         return b.votes - a.votes;
     });
-
+    
     const top3 = captions.slice(0, 3);
     const points = [10, 7, 5];
-
+    
     for (let i = 0; i < top3.length; i++) {
         if (top3[i] && top3[i].votes > 0) {
             await addTeamBonus(top3[i].triad, points[i]);
