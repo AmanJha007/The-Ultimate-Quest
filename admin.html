@@ -5,12 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QUEST COMMAND CENTER</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            display: block !important;
+            overflow: auto !important;
+            height: auto !important;
+            padding: 20px;
+        }
+        .panel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .gate-box {
+            position: relative;
+            margin: 0 !important;
+        }
+        .gate-box h2 { font-size: 1.1rem; }
+        .gate-box p  { font-size: 0.8rem; }
+        /* Status chips */
+        .status-chip {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+        .status-ok    { background: rgba(0,255,0,0.15); color: #0f0; border: 1px solid #0f0; }
+        .status-warn  { background: rgba(255,215,0,0.15); color: #ffd700; border: 1px solid #ffd700; }
+        .status-error { background: rgba(255,0,60,0.15); color: #ff003c; border: 1px solid #ff003c; }
+        /* Player list */
+        #player-list-container {
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid #008f11;
+            padding: 10px;
+            font-size: 0.8rem;
+        }
+        .player-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px dashed #333;
+        }
+        .player-row:last-child { border-bottom: none; }
+        .player-triad { color: #14B8A6; min-width: 50px; }
+        .player-alias { color: #0f0; flex: 1; margin-left: 10px; }
+        .player-score { color: #ffd700; min-width: 70px; text-align: right; }
+        /* Emergency buttons */
+        .btn-danger { background: #ff003c !important; border: none !important; color: #fff !important; }
+        .btn-safe   { background: #14B8A6 !important; border: none !important; color: #fff !important; }
+        .btn-go     { background: #0f0 !important; border: none !important; color: #000 !important; }
+        .btn-warn   { background: #ffd700 !important; border: none !important; color: #000 !important; }
+        /* Section divider */
+        .section-title {
+            font-size: 0.7rem;
+            color: #008f11;
+            letter-spacing: 0.2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #008f11;
+            padding-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
-    <div class="gate-box" style="margin: 50px auto; max-width: 400px; position: relative;">
+
+<div class="panel-grid">
+
+    <!-- ═══ PANEL 1: ROUND CONTROL ═══ -->
+    <div class="gate-box">
         <h2>ADMIN COMMAND</h2>
         <p>SET GLOBAL EVENT STAGE</p>
-        
+
         <select id="round-select">
             <option value="1">Round 1: Kahoot Quiz</option>
             <option value="2">Round 2: Scavenger Hunt</option>
@@ -19,10 +91,90 @@
         </select>
 
         <button id="btn-set-round" style="margin-bottom: 10px;">1. DEPLOY ROUND</button>
-        <button id="btn-unlock-game" style="background: #14B8A6; border: none; color: #fff;">2. UNLOCK PLAY BUTTON</button>
-        
-        <div id="admin-status" style="margin-top: 15px; color: var(--text-main);"></div></div>
+        <button id="btn-unlock-game" class="btn-safe">2. UNLOCK PLAY BUTTON</button>
 
-    <script type="module" src="js/admin.js"></script>
+        <div class="section-title">QUICK ACTIONS</div>
+        <button id="btn-quick-deploy" class="btn-go" style="margin-bottom:10px;">⚡ DEPLOY + UNLOCK (ONE CLICK)</button>
+        <button id="btn-lock-game" class="btn-danger">🔒 EMERGENCY LOCK GAME</button>
+
+        <div id="admin-status" style="margin-top: 15px; color: var(--text-main);"></div>
+    </div>
+
+    <!-- ═══ PANEL 2: MANUAL SCORE INJECTION ═══ -->
+    <div class="gate-box">
+        <h2>MANUAL OVERRIDE</h2>
+        <p>INJECT SECURE ASSET SCORES</p>
+
+        <select id="manual-triad-select">
+            <option value="" disabled selected>Select Triad Unit</option>
+            <option value="T1">Unit 01</option>
+            <option value="T2">Unit 02</option>
+            <option value="T3">Unit 03</option>
+            <option value="T4">Unit 04</option>
+            <option value="T5">Unit 05</option>
+            <option value="T6">Unit 06</option>
+            <option value="T7">Unit 07</option>
+            <option value="T8">Unit 08</option>
+            <option value="T9">Unit 09</option>
+            <option value="T10">Unit 10</option>
+            <option value="T11">Unit 11</option>
+            <option value="T12">Unit 12</option>
+            <option value="T13">Unit 13</option>
+            <option value="T14">Unit 14</option>
+            <option value="T15">Unit 15</option>
+            <option value="T16">Unit 16</option>
+            <option value="T17">Unit 17</option>
+            <option value="T18">Unit 18</option>
+            <option value="T19">Unit 19</option>
+            <option value="T20">Unit 20</option>
+            <option value="BACKEND_OC">Backend OCs</option>
+        </select>
+
+        <input type="number" id="manual-points" placeholder="ENTER POINTS (e.g., 50)" autocomplete="off"
+               style="width:100%; margin-bottom:1rem; padding:0.75rem; background:transparent; border:1px solid var(--text-main); color:var(--text-main); font-family:var(--font-stack); font-size:1rem; text-align:center;">
+
+        <button id="btn-inject-score" class="btn-danger">INJECT POINTS</button>
+
+        <div id="override-status" style="margin-top: 15px; color: var(--text-main);"></div>
+    </div>
+
+    <!-- ═══ PANEL 3: ROUND 3 CONTROLS ═══ -->
+    <div class="gate-box">
+        <h2>ROUND 3 CONTROLS</h2>
+        <p>WITTY CAPTIONS MASTER CLOCK</p>
+
+        <input type="number" id="r3-image-index" placeholder="IMAGE NUMBER (1–14)" min="1" max="14" autocomplete="off"
+               style="width:100%; margin-bottom:1rem; padding:0.75rem; background:transparent; border:1px solid var(--text-main); color:var(--text-main); font-family:var(--font-stack); font-size:1rem; text-align:center;">
+
+        <button id="btn-r3-input"  class="btn-safe"   style="margin-bottom:10px;">1. START SUBMISSIONS (40s)</button>
+        <button id="btn-r3-vote"   class="btn-danger"  style="margin-bottom:10px;">2. START VOTING (30s)</button>
+        <button id="btn-r3-award"  class="btn-go">3. CALCULATE &amp; AWARD</button>
+
+        <div id="r3-status" style="margin-top: 15px; color: var(--text-main);"></div>
+    </div>
+
+    <!-- ═══ PANEL 4: PLAYER MONITOR ═══ -->
+    <div class="gate-box">
+        <h2>PLAYER MONITOR</h2>
+        <p>LIVE REGISTRATION &amp; SCORES</p>
+
+        <button id="btn-view-players" class="btn-warn" style="margin-bottom:10px;">📋 REFRESH PLAYER LIST</button>
+        <div id="player-count" style="font-size:0.85rem; color:#14B8A6; margin-bottom:10px;"></div>
+
+        <div id="player-list-container">
+            <div style="display:flex; justify-content:space-between; padding:5px 0; border-bottom:2px solid #008f11; font-weight:bold; font-size:0.75rem;">
+                <span class="player-triad">UNIT</span>
+                <span class="player-alias">ALIAS</span>
+                <span class="player-score">SCORE</span>
+            </div>
+            <div id="player-list"></div>
+        </div>
+
+        <div id="monitor-status" style="margin-top: 15px; color: var(--text-main);"></div>
+    </div>
+
+</div>
+
+<script type="module" src="js/admin.js"></script>
 </body>
 </html>

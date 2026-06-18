@@ -251,3 +251,191 @@ body::after {
     color: var(--accent);
     box-shadow: 0 0 15px var(--accent);
 }
+
+/* ============================================================
+   MOBILE RESPONSIVE — Phones & Tablets (max 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+
+    /* Body: remove center-flex so layout takes full screen */
+    body {
+        display: block;
+        height: 100%;
+        overflow: auto;
+    }
+
+    /* Login gate box: full width, less padding */
+    .gate-box {
+        padding: 2rem 1.2rem;
+        width: 92vw;
+        max-width: 400px;
+    }
+
+    .gate-box h2 {
+        font-size: 1.1rem;
+    }
+
+    /* Bigger tap targets on inputs and buttons */
+    .gate-box select,
+    .gate-box input {
+        padding: 0.9rem;
+        font-size: 0.95rem;
+    }
+
+    .gate-box button {
+        padding: 1rem;
+        font-size: 1rem;
+        min-height: 52px;
+    }
+
+    /* App container: full screen */
+    #app-container {
+        width: 100vw;
+        height: 100%;
+        min-height: 100vh;
+        border: none;
+        box-shadow: none;
+    }
+
+    /* Header: smaller title on small screens */
+    header {
+        padding: 0.6rem 0.8rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+
+    header h1 {
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
+
+    #team-info {
+        font-size: 0.7rem;
+    }
+
+    /* Main layout: stack vertically instead of side-by-side */
+    main {
+        flex-direction: column;
+        overflow: auto;
+    }
+
+    /* Leaderboard: move to bottom, horizontal scroll, compact */
+    #leaderboard-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+        padding: 0.6rem 1rem;
+        max-height: 140px;
+        overflow-y: auto;
+    }
+
+    #leaderboard-panel h2 {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    #leaderboard-list li {
+        font-size: 0.8rem;
+        padding: 0.3rem 0;
+    }
+
+    /* Game stage: full width, scrollable */
+    #game-stage {
+        flex: 1;
+        padding: 0.6rem;
+        overflow: auto;
+    }
+
+    /* Game buttons: bigger tap targets */
+    .game-btn {
+        min-height: 48px;
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        flex: 1;
+        text-align: center;
+    }
+
+    #round-selector,
+    #game-launcher {
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }
+
+    /* Iframe: fixed height on mobile */
+    #game-frame {
+        min-height: 55vh;
+        height: 55vh;
+        flex: none;
+    }
+}
+
+/* Extra small phones (iPhone SE, Galaxy A-series, etc.) */
+@media (max-width: 400px) {
+    .gate-box {
+        padding: 1.5rem 1rem;
+        width: 96vw;
+    }
+
+    header h1 {
+        font-size: 0.7rem;
+    }
+
+    .game-btn {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS (SMARTPHONES)
+========================================= */
+@media screen and (max-width: 768px) {
+    /* Login Gate adjust */
+    .gate-box {
+        width: 90%;
+        padding: 1.5rem;
+    }
+
+    /* Remove outer borders to give max space to the game */
+    #app-container {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+    }
+
+    /* Stack Leaderboard and Game vertically */
+    main {
+        flex-direction: column;
+    }
+
+    /* Leaderboard shifts to top, takes 30% height */
+    #leaderboard-panel {
+        width: 100%;
+        flex: 0 0 30%; 
+        border-right: none;
+        border-bottom: 2px solid var(--border-color);
+        padding: 0.5rem;
+    }
+
+    /* Game stage takes the remaining space below */
+    #game-stage {
+        width: 100%;
+        flex: 1; 
+        padding: 0.5rem;
+    }
+
+    /* Adjust button sizes for touch */
+    .game-btn {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+        flex: 1; /* Makes buttons stretch evenly */
+    }
+
+    #game-launcher {
+        flex-wrap: wrap; /* Prevents buttons from going off-screen */
+    }
+
+    header h1 {
+        font-size: 1.2rem;
+    }
+}
