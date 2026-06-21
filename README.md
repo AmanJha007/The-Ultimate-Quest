@@ -126,7 +126,7 @@ The-Ultimate-Quest/
 
 ## 👥 Team
 
-- **Rishu Sharma** — Frontend Dev, Anti-Cheat System, Mobile Optimization
+- **Rishabh Jain** — Frontend Dev, Anti-Cheat System, Mobile Optimization
 - **Aman Jha** — Project Lead, Core Architecture, Firebase Integration
 
 ---
